@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>SermonNote 로그인</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Nanum Gothic', sans-serif;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .login-card h2 {
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      color: #ffe57f;
+      text-shadow: 0 0 10px #ffd54f;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 20px;
+      margin: 10px 0 20px 0;
+      border-radius: 10px;
+      border: none;
+      font-size: 1.1rem;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+
+    input:focus {
+      box-shadow: 0 0 8px #ffd54f;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(90deg, #ffeb3b, #fdd835);
+      color: #222;
+      font-weight: 700;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 6px 15px rgba(253, 216, 53, 0.7);
+      user-select: none;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #fdd835, #ffeb3b);
+      box-shadow: 0 8px 20px rgba(253, 216, 53, 0.9);
+    }
+
+    .to-signup {
+      margin-top: 18px;
+      font-size: 1rem;
+      color: #ffe57f;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+
+    .to-signup:hover {
+      color: #fff176;
+      text-decoration: underline;
+    }
+
+    .alert {
+      margin-top: 10px;
+      color: #ffcc00;
+      min-height: 22px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <h2 id="loginTitle">로그인</h2>
+    <input type="email" id="loginEmail" placeholder="이메일" />
+    <input type="password" id="loginPassword" placeholder="비밀번호" />
+    <button id="loginBtn">로그인</button>
+    <div class="to-signup" id="signupLink" onclick="goSignup()">회원가입</div>
+    <div class="alert" id="alertMsg"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyArpGvL7Z4_aMLSPxiAcSUHnUfL09snuxA",
+      authDomain: "sermonnote-org.firebaseapp.com",
+      projectId: "sermonnote-org",
+      storageBucket: "sermonnote-org.firebasestorage.app",
+      messagingSenderId: "203062491171",
+      appId: "1:203062491171:web:fa7146a6cb495d01f69996",
+      measurementId: "G-B5YQPV6VT1"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function goSignup() {
+      location.href = "signup.html";
+    }
+
+    const loginBtn = document.getElementById("loginBtn");
+    const alertMsg = document.getElementById("alertMsg");
+
+    loginBtn.onclick = function() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!email || !password) {
+        alertMsg.textContent = "이메일과 비밀번호를 모두 입력해 주세요!";
+        return;
+      }
+
+      loginBtn.disabled = true;
+      alertMsg.textContent = "로그인 중...";
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          alertMsg.textContent = "";
+          location.href = "main.html";  // 로그인 후 이동 경로 확인!
+        })
+        .catch(error => {
+          const msgMap = {
+            "auth/user-not-found": "등록되지 않은 이메일입니다.",
+            "auth/wrong-password": "비밀번호가 틀렸습니다.",
+            "auth/invalid-email": "잘못된 이메일 형식입니다.",
+          };
+          alertMsg.textContent = msgMap[error.code] || "로그인에 실패했습니다: " + error.message;
+        })
+        .finally(() => {
+          loginBtn.disabled = false;
+        });
+    };
+  </script>
+</body>
+</html>
