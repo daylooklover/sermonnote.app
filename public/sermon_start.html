@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>설교 시작 - SermonNote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #232526 0%, #414345 100%);
+      height: 100vh;
+      margin: 0;
+      font-family: 'Nanum Gothic', sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      text-shadow: 0 0 10px #ffd54f;
+    }
+    button {
+      background: #ffeb3b;
+      color: #222;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 48px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 10px 0;
+      cursor: pointer;
+      box-shadow: 0 0 30px #fdd835cc;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    button:hover {
+      background-color: #fdd835;
+      box-shadow: 0 0 45px #fdd835ee;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>설교 작성 시작</h1>
+
+  <button onclick="location.href='sermon_example.html'">퀵메모 연계 설교작성</button>
+  <button onclick="location.href='sermon_prepare.html'">설교 작성하기</button>
+  <button onclick="location.href='sermon_custom.html'">맞춤형 설교 작성</button>
+  <button onclick="location.href='expository-sermon.html'">강해식 설교 작성하기</button>
+
+</body>
+</html>

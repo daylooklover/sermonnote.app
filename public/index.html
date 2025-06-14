@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>SermonNote - 성경 구절</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Nanum Myeongjo, Nanum Gothic 폰트 추가 -->
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: 'Nanum Gothic', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    #topLeftText {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      max-width: 320px;
+      padding: 12px 18px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(255, 215, 79, 0.85);
+      color: white;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      line-height: 1.5;
+      letter-spacing: 0.07em;
+      text-shadow:
+        0 0 6px rgba(255, 224, 130, 0.9),
+        0 0 10px rgba(255, 196, 0, 0.7);
+      user-select: none;
+      z-index: 10000;
+      transition: color 0.3s ease;
+    }
+    #topLeftText strong {
+      font-weight: 800;
+      color: #FFF8E1;
+      text-shadow: 0 0 8px #fffacd;
+    }
+    #topLeftText:hover {
+      color: #FFD740;
+      text-shadow:
+        0 0 10px #fff176,
+        0 0 18px #ffc400;
+    }
+    #title {
+      font-size: 5rem;
+      font-weight: 800;
+      margin: 0 0 24px 0;
+      user-select: none;
+      font-family: 'Nanum Gothic', sans-serif;
+      text-shadow: 0 0 8px #444;
+      color: #ddd;
+    }
+    #verseBox {
+      font-size: 1.5rem;
+      padding: 22px 28px;
+      border-radius: 14px;
+      background-color: #222;
+      box-shadow: 0 0 25px #ffeb3b88;
+      max-width: 700px;
+      min-height: 120px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+      user-select: text;
+      transition: background-color 0.3s ease;
+      font-family: 'Nanum Gothic', sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+    #verseBox span {
+      display: block;
+      font-size: 1rem;
+      color: #ccc;
+      margin-top: 10px;
+      font-style: italic;
+      user-select: text;
+    }
+    button {
+      background-color: #ffeb3b;
+      color: #222;
+      font-size: 1.8rem;
+      padding: 18px 60px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 0 25px #fdd835bb;
+      user-select: none;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      font-family: 'Nanum Gothic', sans-serif;
+      font-weight: 700;
+      margin: 0 10px 20px 10px;
+    }
+    button:hover {
+      background-color: #fdd835;
+      box-shadow: 0 0 35px #fdd835ee;
+    }
+    #quickMemoBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ffcc80;
+      color: #222;
+      font-size: 1.4rem;
+      font-weight: bold;
+      padding: 14px 28px;
+      border-radius: 50px;
+      box-shadow: 0 5px 15px rgba(255, 204, 128, 0.8);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+      z-index: 1000;
+      font-family: 'Nanum Gothic', sans-serif;
+    }
+    #quickMemoBtn:hover {
+      background: linear-gradient(90deg, #ffd180, #ffb74d);
+      box-shadow: 0 7px 25px rgba(255, 183, 77, 1);
+    }
+    #getStartedBtn {
+      background-color: #64b5f6;
+      color: white;
+      font-size: 1.8rem;
+      padding: 18px 60px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 0 25px #64b5f6bb;
+      user-select: none;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      font-family: 'Nanum Gothic', sans-serif;
+      font-weight: 700;
+      margin: 20px 10px 0 10px;
+    }
+    #getStartedBtn:hover {
+      background-color: #42a5f5;
+      box-shadow: 0 0 35px #42a5f5ee;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="topLeftText">
+    AI와 함께<br/>
+    하나님의 말씀을<br/>
+    더 가까이, 더 깊게<br/>
+    전하는 사역 플랫폼 -&nbsp;
+    <span id="platformLink" style="
+      color: #ffd54f;
+      cursor: pointer;
+      text-decoration: underline;
+    ">
+      말씀노트
+    </span>
+    <div id="infoBox" style="display:none; margin-top: 12px; font-size: 0.9rem; color: #fff;">
+      <p>말씀노트는 AI 기술과 신앙 콘텐츠가 융합된 국내 최초 설교 작성 플랫폼입니다.</p>
+      <p>설교 준비를 효율적으로 돕고, 말씀 나눔을 지원합니다.</p>
+    </div>
+  </div>
+
+  <h1 id="title">sermonnote</h1>
+
+  <div id="verseBox"></div>
+
+  <button id="getStartedBtn" title="시작하기">Get Started</button>
+
+  <button id="quickMemoBtn" title="퀵메모로 이동">✍ 퀵메모</button>
+
+  <script>
+    const platformLink = document.getElementById('platformLink');
+    const infoBox = document.getElementById('infoBox');
+
+    platformLink.addEventListener('click', () => {
+      if (infoBox.style.display === 'none') {
+        infoBox.style.display = 'block';
+
+        // 3초 후 가이드 페이지로 자동 이동
+        setTimeout(() => {
+          window.location.href = 'guide.html';
+        }, 3000);
+
+      } else {
+        infoBox.style.display = 'none';
+      }
+    });
+
+    const verses = [
+      ["내가 너를 고아와 같이 버려두지 아니하고 너희에게로 오리라", "I will not leave you as orphans; I will come to you. (John 14:18)"],
+      ["두려워하지 말라 내가 너와 함께 함이라", "Do not fear, for I am with you. (Isaiah 41:10)"],
+      ["주께서 너를 항상 인도하시리니", "The Lord will guide you always. (Isaiah 58:11)"],
+      ["너희는 세상의 빛이라", "You are the light of the world. (Matthew 5:14)"],
+      ["주님은 변함없으시다", "Jesus Christ is the same yesterday and today and forever. (Hebrews 13:8)"],
+      ["모든 지킬 만한 것 중에 더욱 네 마음을 지키라", "Above all else, guard your heart. (Proverbs 4:23)"],
+      ["내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라", "I can do all this through him who gives me strength. (Philippians 4:13)"],
+      ["여호와를 바랄지어다", "Wait for the Lord. (Psalm 27:14)"]
+    ];
+
+    function showRandomVerse() {
+      const verseBox = document.getElementById('verseBox');
+      const randomIndex = Math.floor(Math.random() * verses.length);
+      const [kor, eng] = verses[randomIndex];
+      verseBox.innerHTML = `<b>${kor}</b><br><span>${eng}</span>`;
+    }
+
+    showRandomVerse();
+    setInterval(showRandomVerse, 2000);
+
+    document.getElementById('quickMemoBtn').addEventListener('click', () => {
+      location.href = 'quickmemo.html';
+    });
+
+    document.getElementById('getStartedBtn').addEventListener('click', () => {
+      location.href = 'auth/login.html'; // 로그인 페이지 경로
+    });
+  </script>
+
+</body>
+</html>
