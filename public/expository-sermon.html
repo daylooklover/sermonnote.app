@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>강해 설교 작성기 (목회자용)</title>
+  <style>
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+      background: linear-gradient(135deg, #1c1c2b, #28313b);
+      margin: 0;
+      color: #f0e6d2;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* 상단 정렬 */
+      min-height: 100vh;
+      padding: 40px 0; /* 상하 패딩 추가 */
+      box-sizing: border-box;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 900px;
+      width: 95%;
+      box-sizing: border-box;
+    }
+    h2 {
+      color: #222;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+    }
+    label {
+      color: #222;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+      margin-top: 15px;
+      font-size: 1.1rem;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      resize: vertical;
+      background-color: #f9f9f9;
+      color: #222;
+    }
+    textarea {
+      line-height: 30px;
+      background: linear-gradient(to bottom, #fff 29px, #f0f0f0 30px),
+                  url('https://www.transparenttextures.com/patterns/lined-paper.png');
+      background-size: 100% 30px;
+      background-repeat: repeat-y;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      min-height: 150px; /* 기본 높이 설정 */
+    }
+    .output-box {
+      background: #eee;
+      color: #222;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      border: 1px solid #ddd;
+      min-height: 40px; /* 기본 높이 */
+      display: flex;
+      align-items: center; /* 세로 중앙 정렬 */
+      word-break: break-word; /* 긴 단어 줄바꿈 */
+    }
+    #originalLanguageOutput {
+      background: #222;
+      color: #ffeb3b; /* 강조색 */
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      text-align: left;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 15px rgba(255, 235, 59, 0.2);
+      min-height: 40px;
+    }
+
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      background: #ffea00;
+      color: #222;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover:not(:disabled) {
+      background: #fff176;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+    }
+    button:disabled {
+      background: #ccc;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    #micBtn {
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      vertical-align: middle;
+      background: #ff5252;
+      color: white;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 10px;
+      box-shadow: 0 4px 8px rgba(255, 82, 82, 0.4);
+    }
+    #micBtn.active {
+      background: #e00000;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(244,67,54,0.7); }
+      70%  { box-shadow: 0 0 0 15px rgba(244,67,54,0); }
+      100% { box-shadow: 0 0 0 0 rgba(244,67,54,0); }
+    }
+    .ai-suggestion-box {
+      /* 기존 배경색 대신 노트 이미지 배경 적용 */
+      background: linear-gradient(to bottom, #fff 29px, #f0f0f0 30px),
+                  url('https://www.transparenttextures.com/patterns/lined-paper.png');
+      background-size: 100% 30px;
+      background-repeat: repeat-y;
+      color: #333; /* 노트 배경에 맞춰 텍스트 색상 변경 */
+      padding: 16px;
+      border-radius: 12px;
+      min-height: 120px;
+      white-space: pre-wrap;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1); /* 그림자도 밝게 변경 */
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>📖 강해 설교 작성기 (목회자용)</h2>
+
+  <label for="scriptureInput">1. 성경 본문</label>
+  <input type="text" id="scriptureInput" placeholder="예: 요한복음 3장 16절 또는 창세기 1장 1-5절">
+  <div class="button-group">
+    <button id="fetchVerseBtn">성경 본문 가져오기</button>
+    <button id="fetchOriginalLanguageBtn">원어 통찰</button>
+  </div>
+  <div id="bibleVerseOutput" class="output-box">📖 성경 구절 본문이 여기에 표시됩니다</div>
+  <div id="originalLanguageOutput" class="output-box">📜 원어 통찰이 여기에 표시됩니다</div>
+
+  <label for="explanationTextarea">2. 본문 해석 및 주석 (AI 추천 포함)</label>
+  <textarea id="explanationTextarea" placeholder="본문에 대한 해석과 주석을 직접 입력하거나, AI 주석 추천 버튼을 활용하세요."></textarea>
+  <div class="button-group">
+    <button id="aiCommentaryBtn">AI 주석 추천</button>
+  </div>
+  <div id="aiCommentarySuggestion" class="ai-suggestion-box">🧠 AI 주석 추천이 여기에 표시됩니다</div>
+
+  <label for="applicationTextarea">3. 적용 및 결론</label>
+  <textarea id="applicationTextarea" placeholder="설교의 적용점과 결론을 정리하세요."></textarea>
+
+  <div class="button-group">
+    <button id="generateFullSermonBtn">✨ 전체 설교 개요/메시지 AI 추천</button>
+    <button id="savePDFBtn">📄 PDF 저장</button>
+    <button onclick="window.print()">🖨️ 인쇄</button>
+    <button id="micBtn">🎤 음성 입력</button>
+  </div>
+
+  <div id="aiFullSermonSuggestion" class="ai-suggestion-box">💡 AI 설교 개요/메시지 추천이 여기에 표시됩니다</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const backendUrl = 'http://localhost:3000'; // 백엔드 서버 주소
+
+// --- DOM 요소 참조 ---
+const scriptureInput = document.getElementById('scriptureInput');
+const bibleVerseOutput = document.getElementById('bibleVerseOutput');
+const originalLanguageOutput = document.getElementById('originalLanguageOutput');
+const explanationTextarea = document.getElementById('explanationTextarea');
+const aiCommentarySuggestion = document.getElementById('aiCommentarySuggestion');
+const applicationTextarea = document.getElementById('applicationTextarea');
+const aiFullSermonSuggestion = document.getElementById('aiFullSermonSuggestion');
+
+const fetchVerseBtn = document.getElementById('fetchVerseBtn');
+const fetchOriginalLanguageBtn = document.getElementById('fetchOriginalLanguageBtn');
+const aiCommentaryBtn = document.getElementById('aiCommentaryBtn');
+const generateFullSermonBtn = document.getElementById('generateFullSermonBtn');
+const savePDFBtn = document.getElementById('savePDFBtn');
+const micBtn = document.getElementById('micBtn');
+
+// --- 유틸리티 함수 ---
+
+// 모든 버튼 및 입력 필드 활성화/비활성화 상태를 토글하는 함수
+function setUIState(disabled) {
+    const interactiveElements = [
+        scriptureInput, fetchVerseBtn, fetchOriginalLanguageBtn,
+        explanationTextarea, aiCommentaryBtn, applicationTextarea,
+        generateFullSermonBtn, savePDFBtn, micBtn
+    ];
+    interactiveElements.forEach(el => el.disabled = disabled);
+}
+
+// 사용자에게 메시지 표시 (alert 대체)
+function displayMessage(targetElement, message, type = 'info') {
+    targetElement.textContent = message;
+    if (type === 'info') {
+        targetElement.style.backgroundColor = '#f5f5f5'; /* 노트 배경에 맞게 변경 */
+        targetElement.style.color = '#333';
+    } else if (type === 'loading') {
+        targetElement.style.backgroundColor = '#e0f2f7'; /* Light blue for loading */
+        targetElement.style.color = '#000';
+    } else if (type === 'error') {
+        targetElement.style.backgroundColor = '#ffebee'; /* Light red for error */
+        targetElement.style.color = '#d32f2f';
+    } else if (type === 'warning') {
+        targetElement.style.backgroundColor = '#fff3e0'; /* Light orange for warning */
+        targetElement.style.color = '#e65100';
+    }
+}
+
+// --- API 호출 함수 ---
+
+// 백엔드를 통해 AI와 통신하는 제너릭 함수
+async function callBackendAI(endpoint, prompt, systemPrompt, bibleReference = '') {
+    setUIState(true); // UI 비활성화
+    try {
+        const response = await fetch(`${backendUrl}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, systemPrompt, bibleReference })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || response.statusText);
+        }
+
+        const data = await response.json();
+        return data.content || data.insight; // 응답 형식에 따라 content 또는 insight 반환
+    } catch (error) {
+        console.error(`백엔드 AI 호출 오류 (${endpoint}):`, error);
+        throw error; // 오류를 다시 던져서 호출한 곳에서 처리
+    } finally {
+        setUIState(false); // UI 활성화
+    }
+}
+
+// --- 이벤트 리스너 ---
+
+// 성경 본문 가져오기 버튼 클릭 이벤트
+fetchVerseBtn.addEventListener('click', async () => {
+    const reference = scriptureInput.value.trim();
+    if (!reference) {
+        displayMessage(bibleVerseOutput, '❗ 성경 구절을 입력해주세요.', 'warning');
+        return;
+    }
+    displayMessage(bibleVerseOutput, '📖 성경 구절 본문을 불러오는 중...', 'loading');
+    setUIState(true);
+    try {
+        const response = await fetch(`${backendUrl}/api/bible-verse?reference=${encodeURIComponent(reference)}&translation=kor`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || response.statusText);
+        }
+        const data = await response.json();
+        displayMessage(bibleVerseOutput, data.text || '📕 구절 본문을 찾을 수 없습니다.');
+    } catch (error) {
+        displayMessage(bibleVerseOutput, '📕 성경 구절 로딩 오류: ' + error.message, 'error');
+    } finally {
+        setUIState(false);
+    }
+});
+
+// 원어 통찰 버튼 클릭 이벤트 (새로 추가)
+fetchOriginalLanguageBtn.addEventListener('click', async () => {
+    const reference = scriptureInput.value.trim();
+    if (!reference) {
+        displayMessage(originalLanguageOutput, '❗ 원어 통찰을 보려면 성경 구절을 입력해주세요.', 'warning');
+        return;
+    }
+    displayMessage(originalLanguageOutput, '📜 AI가 원어 통찰을 분석 중입니다...', 'loading');
+    
+    try {
+        // 백엔드의 /api/original-language-insight 엔드포인트 호출
+        const response = await fetch(`${backendUrl}/api/original-language-insight`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bibleReference: reference })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || response.statusText);
+        }
+
+        const data = await response.json();
+        displayMessage(originalLanguageOutput, data.insight || '📜 원어 통찰을 가져올 수 없습니다.');
+    } catch (error) {
+        displayMessage(originalLanguageOutput, '❌ 원어 통찰 오류: ' + error.message, 'error');
+    }
+});
+
+
+// AI 주석 추천 버튼 클릭 이벤트 (새로 추가)
+aiCommentaryBtn.addEventListener('click', async () => {
+    const scripture = scriptureInput.value.trim();
+    const currentExplanation = explanationTextarea.value.trim();
+
+    if (!scripture && !currentExplanation) {
+        displayMessage(aiCommentarySuggestion, '❗ 주석 추천을 받으려면 성경 구절이나 현재 해석을 입력해주세요.', 'warning');
+        return;
+    }
+
+    displayMessage(aiCommentarySuggestion, '🧠 AI가 주석을 추천 중입니다. 잠시만 기다려주세요...', 'loading');
+    
+    const prompt = `성경 구절: ${scripture}\n현재 해석: ${currentExplanation}\n위 내용을 바탕으로 이 구절에 대한 깊이 있는 주석(말씀의 배경, 신학적 의미, 현대적 적용점 등)을 200단어 내외로 작성해줘.`;
+    const systemPrompt = "당신은 성경적 배경과 신학적 통찰을 가진 AI 주석가입니다. 목회자들이 설교를 풍성하게 하는 데 도움이 되는 전문적인 주석을 제공합니다.";
+
+    try {
+        const result = await callBackendAI('/api/ai-process', prompt, systemPrompt, scripture);
+        displayMessage(aiCommentarySuggestion, result);
+        // 생성된 주석을 해석/주석 칸에 추가할지 물어볼 수 있습니다.
+        // if (confirm('생성된 주석을 본문 해석 칸에 추가하시겠습니까?')) {
+        //     explanationTextarea.value += '\n\n' + result;
+        // }
+    } catch (error) {
+        displayMessage(aiCommentarySuggestion, '❌ AI 주석 추천 오류: ' + error.message, 'error');
+    }
+});
+
+
+// 전체 설교 개요/메시지 AI 추천 버튼 클릭 이벤트
+generateFullSermonBtn.addEventListener('click', async () => {
+    const scripture = scriptureInput.value.trim();
+    const explanation = explanationTextarea.value.trim();
+    const application = applicationTextarea.value.trim();
+
+    if (!scripture && !explanation && !application) {
+        displayMessage(aiFullSermonSuggestion, '❗ 설교 개요 추천을 받으려면 성경 구절, 해석, 적용 중 하나 이상을 입력해주세요.', 'warning');
+        return;
+    }
+
+    displayMessage(aiFullSermonSuggestion, '✨ AI가 전체 설교 개요/메시지를 분석 중입니다. 잠시만 기다려주세요...', 'loading');
+
+    const prompt = `📖 본문: ${scripture || '없음'}\n🧠 해석 및 주석: ${explanation || '없음'}\n🙏 적용 및 결론: ${application || '없음'}\n위 내용을 바탕으로 전체 설교 개요(서론, 본론(소주제 2~3개), 결론 포함)와 핵심 성경적 메시지를 풍성하게 정리해줘.`;
+    const systemPrompt = '당신은 성경 본문과 적용 중심의 강해 설교 전문가입니다. 목회자를 돕는 명확하고 감동적인 설교 개요와 핵심 메시지를 작성합니다.';
+
+    try {
+        const result = await callBackendAI('/api/ai-process', prompt, systemPrompt, scripture);
+        displayMessage(aiFullSermonSuggestion, result);
+    } catch (error) {
+        displayMessage(aiFullSermonSuggestion, '❌ AI 설교 개요 추천 오류: ' + error.message, 'error');
+    }
+});
+
+
+// PDF 저장 기능
+savePDFBtn.addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const scriptureText = scriptureInput.value.trim();
+    const bibleVerseText = bibleVerseOutput.textContent.trim();
+    const originalLanguageText = originalLanguageOutput.textContent.trim();
+    const explanationText = explanationTextarea.value.trim();
+    const aiCommentaryText = aiCommentarySuggestion.textContent.trim();
+    const applicationText = applicationTextarea.value.trim();
+    const aiFullSermonText = aiFullSermonSuggestion.textContent.trim();
+    
+    // 유효한 내용이 있는지 확인
+    if (!scriptureText && !explanationText && !applicationText && 
+        !aiCommentaryText.includes('AI 주석 추천이 여기에 표시됩니다') && 
+        !aiFullSermonText.includes('AI 설교 개요/메시지 추천이 여기에 표시됩니다')) {
+        displayMessage(aiFullSermonSuggestion, "❗ 저장할 내용이 없습니다.", 'warning'); // 임시 메시지 표시
+        return;
+    }
+
+    let content = ``;
+    if (scriptureText) content += `📖 성경 본문:\n${scriptureText}\n\n`;
+    if (bibleVerseText && !bibleVerseText.includes('성경 구절 본문이 여기에 표시됩니다') && !bibleVerseText.includes('구절 본문을 찾을 수 없습니다') && !bibleVerseText.includes('로딩 오류')) {
+        content += `(본문 내용: ${bibleVerseText})\n\n`;
+    }
+    if (originalLanguageText && !originalLanguageText.includes('원어 통찰이 여기에 표시됩니다') && !originalLanguageText.includes('원어 통찰을 보려면 성경 구절을 입력해주세요') && !originalLanguageText.includes('원어 통찰 오류')) {
+        content += `  원어 통찰:\n${originalLanguageText}\n\n`;
+    }
+    content += `--- 해석 및 주석 ---\n`;
+    if (explanationText) content += `${explanationText}\n`;
+    if (aiCommentaryText && !aiCommentaryText.includes('AI 주석 추천이 여기에 표시됩니다') && !aiCommentaryText.includes('주석 추천을 받으려면') && !aiCommentaryText.includes('주석 추천 오류')) {
+        content += `🧠 AI 주석 추천:\n${aiCommentaryText}\n\n`;
+    } else if (!explanationText) {
+        content += `(주석 내용 없음)\n\n`;
+    }
+    
+    content += `--- 적용 및 결론 ---\n`;
+    if (applicationText) content += `${applicationText}\n`;
+    if (aiFullSermonText && !aiFullSermonText.includes('AI 설교 개요/메시지 추천이 여기에 표시됩니다') && !aiFullSermonText.includes('설교 개요 추천을 받으려면') && !aiFullSermonText.includes('설교 개요 추천 오류')) {
+        content += `✨ AI 설교 개요/메시지 추천:\n${aiFullSermonText}\n\n`;
+    } else if (!applicationText) {
+        content += `(적용 및 결론 내용 없음)\n\n`;
+    }
+
+
+    // 한글 지원을 위해서는 jspdf-autotable과 커스텀 폰트 로딩 필요
+    // 여기서는 기본 폰트 사용 (한글 깨질 수 있음)
+    // doc.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal');
+    // doc.setFont('NanumGothic');
+
+    const lines = doc.splitTextToSize(content, 180); // 180mm 너비에 맞춰 텍스트 분할
+    let y = 10;
+    const lineHeight = 7;
+
+    lines.forEach(line => {
+        if (y > 280) { // 페이지 끝에 도달하면 새 페이지 추가
+            doc.addPage();
+            y = 10;
+        }
+        doc.text(line, 10, y);
+        y += lineHeight;
+    });
+
+    doc.save('강해설교_작성기.pdf');
+    displayMessage(aiFullSermonSuggestion, "✅ 설교문이 PDF로 저장되었습니다.", 'info');
+});
+
+
+// 🎤 음성 입력 시작 함수
+function startMic() {
+    const focusedElement = document.activeElement; // 현재 포커스된 요소
+    
+    // 텍스트 입력 필드(textarea 또는 input[type="text"])에만 적용
+    if (focusedElement && (focusedElement.tagName === 'TEXTAREA' || (focusedElement.tagName === 'INPUT' && focusedElement.type === 'text'))) {
+        if (!('webkitSpeechRecognition' in window)) {
+            displayMessage(aiFullSermonSuggestion, "⚠️ 크롬 브라우저에서만 음성 입력이 지원됩니다.", 'warning');
+            return;
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'ko-KR'; // 한국어 설정
+
+        recognition.onstart = () => {
+            micBtn.classList.add('active');
+            displayMessage(aiFullSermonSuggestion, "음성 입력을 시작합니다. 말씀하세요...", 'info');
+        };
+        recognition.onend = () => {
+            micBtn.classList.remove('active');
+            displayMessage(aiFullSermonSuggestion, "음성 입력이 종료되었습니다.", 'info');
+        };
+        recognition.onerror = (event) => {
+            displayMessage(aiFullSermonSuggestion, "음성 인식 오류: " + event.error, 'error');
+            console.error("Speech Recognition Error:", event.error);
+            micBtn.classList.remove('active');
+        };
+        recognition.onresult = (event) => {
+            const text = event.results[0][0].transcript;
+            focusedElement.value += "\n— " + text; // 현재 포커스된 요소에 텍스트 추가
+        };
+        
+        recognition.start();
+    } else {
+        displayMessage(aiFullSermonSuggestion, "음성 입력을 시작하려면 텍스트 입력 필드에 커서를 두세요.", 'warning');
+    }
+}
+
+// 음성 입력 버튼 이벤트 리스너 추가
+micBtn.addEventListener('click', startMic);
+
+// 초기 로딩 시 플레이스홀더 설정
+window.onload = () => {
+    displayMessage(bibleVerseOutput, '📖 성경 구절 본문이 여기에 표시됩니다', 'info');
+    displayMessage(originalLanguageOutput, '📜 원어 통찰이 여기에 표시됩니다', 'info');
+    displayMessage(aiCommentarySuggestion, '🧠 AI 주석 추천이 여기에 표시됩니다', 'info');
+    displayMessage(aiFullSermonSuggestion, '💡 AI 설교 개요/메시지 추천이 여기에 표시됩니다', 'info');
+};
+</script>
+</body>
+</html>
+ 

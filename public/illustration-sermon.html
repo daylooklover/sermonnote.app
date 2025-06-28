@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>예화 중심 설교 작성기 (목회자용)</title>
+  <style>
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+      background: linear-gradient(135deg, #1c1c2b, #28313b);
+      margin: 0;
+      color: #f0e6d2;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* 상단 정렬 */
+      min-height: 100vh;
+      padding: 40px 20px; /* 상하좌우 패딩 추가 */
+      box-sizing: border-box;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap; /* 반응형을 위해 줄바꿈 허용 */
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 1400px; /* 전체 너비 제한을 더 넓게 */
+      width: 100%;
+      gap: 20px; /* 컬럼 간 간격 */
+      box-sizing: border-box;
+    }
+    .column {
+      flex: 1;
+      min-width: 350px; /* 최소 너비 설정 약간 증가 */
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    .column.left {
+      max-width: 500px; /* 예화 선택 컬럼 너비 제한 약간 증가 */
+    }
+    .column.right {
+      flex: 2; /* 설교 작성 컬럼 더 넓게 */
+      /* 설교문 작성 배경을 노트 이미지로 변경 */
+      background: linear-gradient(to bottom, #fff 29px, #f0f0f0 30px),
+                  url('https://www.transparenttextures.com/patterns/lined-paper.png');
+      background-size: 100% 30px;
+      background-repeat: repeat-y;
+      color: #333; /* 노트 배경에 맞춰 텍스트 색상 변경 */
+      border-radius: 10px; /* 기존 둥근 모서리 유지 */
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* 기존 그림자 유지 */
+      padding: 20px; /* 기존 패딩 유지 */
+    }
+
+    h2 {
+      color: #222;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+    }
+    label {
+      color: #222;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+      margin-top: 15px;
+      font-size: 1rem;
+    }
+    textarea, input[type="text"] {
+      width: calc(100% - 24px); /* 패딩 고려 */
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      resize: vertical;
+      background-color: #fff;
+      color: #222;
+    }
+    textarea {
+      line-height: 30px;
+      background: transparent; /* 부모 컬럼 배경이 보이도록 투명 설정 */
+      box-shadow: none; /* 기존 그림자 제거 (부모가 관리) */
+      min-height: 400px; /* 설교문 작성란 높이 증가 */
+    }
+    .button-group {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      background: #ffea00;
+      color: #222;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover:not(:disabled) {
+      background: #fff176;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+    button:disabled {
+      background: #ccc;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    #micBtn {
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 1.3rem;
+      vertical-align: middle;
+      background: #ff5252;
+      color: white;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 5px;
+      box-shadow: 0 4px 8px rgba(255, 82, 82, 0.4);
+    }
+    #micBtn.active {
+      background: #e00000;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(244,67,54,0.7); }
+      70%  { box-shadow: 0 0 0 10px rgba(244,67,54,0); }
+      100% { box-shadow: 0 0 0 0 rgba(244,67,54,0); }
+    }
+    .illustration-list {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 200px;
+      background: #eee;
+      color: #333;
+    }
+    .illustration-item {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: background-color 0.2s, border-color 0.2s;
+      white-space: pre-wrap; /* 줄바꿈 유지 */
+    }
+    .illustration-item:hover {
+      background-color: #f0f0f0;
+      border-color: #c0c0c0;
+    }
+    .message-box {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #fff;
+      background-color: #555;
+    }
+    .message-box.loading { background-color: #4a90e2; }
+    .message-box.error { background-color: #d0021b; }
+    .message-box.warning { background-color: #f5a623; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="column left">
+      <h2>✨ 예화 찾기 / 생성 ✨</h2>
+      <label for="illustrationTopic">예화 주제 입력</label>
+      <input type="text" id="illustrationTopic" placeholder="예: 길 잃은 나그네, 용서, 희생">
+      <div class="button-group">
+        <button id="generateIllustrationsBtn">AI 예화 추천 (5개)</button>
+        <button id="micBtnTopic">🎤 음성 입력</button>
+      </div>
+      <div id="illustrationMessage" class="message-box">AI가 추천할 예화가 여기에 나타납니다.</div>
+      <div id="illustrationList" class="illustration-list">
+        <!-- AI가 생성한 예화 목록이 여기에 표시됩니다 -->
+      </div>
+    </div>
+
+    <div class="column right">
+      <h2>✍ 설교문 작성</h2>
+      <textarea id="sermonContent" placeholder="선택된 예화를 바탕으로 설교문을 작성하세요..."></textarea>
+      <div class="button-group">
+        <button id="generateSermonFromIllustrationBtn">예화를 바탕으로 설교 작성</button> <!-- 새로 추가된 버튼 -->
+        <button id="savePDFBtn">📄 PDF 저장</button>
+        <button onclick="window.print()">🖨️ 인쇄</button>
+        <button id="clearSermonBtn">🧼 내용 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const backendUrl = 'http://localhost:3000'; // 백엔드 서버 주소
+
+    // --- DOM 요소 참조 ---
+    const illustrationTopicInput = document.getElementById('illustrationTopic');
+    const generateIllustrationsBtn = document.getElementById('generateIllustrationsBtn');
+    const micBtnTopic = document.getElementById('micBtnTopic');
+    const illustrationMessage = document.getElementById('illustrationMessage');
+    const illustrationList = document.getElementById('illustrationList');
+    const sermonContent = document.getElementById('sermonContent');
+    const generateSermonFromIllustrationBtn = document.getElementById('generateSermonFromIllustrationBtn'); // 새로 추가된 버튼 참조
+    const savePDFBtn = document.getElementById('savePDFBtn');
+    const clearSermonBtn = document.getElementById('clearSermonBtn');
+
+    // --- 유틸리티 함수 ---
+
+    // UI 요소 활성화/비활성화
+    function setUIState(disabled) {
+        const interactiveElements = [
+            illustrationTopicInput, generateIllustrationsBtn, micBtnTopic,
+            sermonContent, generateSermonFromIllustrationBtn, savePDFBtn, clearSermonBtn
+        ];
+        interactiveElements.forEach(el => el.disabled = disabled);
+    }
+
+    // 메시지 표시
+    function displayMessage(element, message, type = 'info') {
+        element.textContent = message;
+        element.className = 'message-box ' + type;
+    }
+
+    // --- API 호출 함수 ---
+
+    // AI에게 예화 생성을 요청하는 함수
+    async function generateIllustrations() {
+        const topic = illustrationTopicInput.value.trim();
+        if (!topic) {
+            displayMessage(illustrationMessage, '❗ 예화 주제를 입력해주세요.', 'warning');
+            return;
+        }
+
+        displayMessage(illustrationMessage, '🧠 AI가 예화를 생성 중입니다. 잠시만 기다려주세요...', 'loading');
+        setUIState(true); // UI 비활성화
+
+        const prompt = `${topic} 주제에 대한 기독교 예화 5개를 JSON 배열 형태로 생성해줘. 각 예화는 3~5문장 정도로 구성해줘. 예시: ["예화1 내용", "예화2 내용", ...]`;
+        const systemPrompt = "당신은 기독교 설교에 적합한 예화를 창의적으로 생성하는 AI 도우미입니다. 사용자의 요청에 따라 다양한 주제의 예화를 제공합니다.";
+
+        try {
+            const response = await fetch(`${backendUrl}/api/ai-process`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, systemPrompt })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || response.statusText);
+            }
+
+            const data = await response.json();
+            let illustrations;
+            try {
+                // AI 응답이 JSON 문자열 형태일 것으로 예상하고 파싱
+                illustrations = JSON.parse(data.content);
+                if (!Array.isArray(illustrations) || illustrations.length === 0) {
+                    throw new Error('AI가 유효한 예화 목록을 반환하지 않았습니다.');
+                }
+            } catch (parseError) {
+                console.error("AI 응답 파싱 오류:", parseError);
+                // JSON 파싱 실패 시, 원시 텍스트를 한 줄씩 분리하여 처리 시도
+                illustrations = data.content.split('\n').filter(line => line.trim() !== '');
+                if (illustrations.length === 0) {
+                    throw new Error('AI 응답을 처리할 수 없습니다. 다시 시도해주세요.');
+                }
+            }
+
+            renderIllustrationList(illustrations);
+            displayMessage(illustrationMessage, '✅ AI 예화 추천이 완료되었습니다. 예화를 클릭하여 설교에 추가하세요.', 'info');
+        } catch (error) {
+            displayMessage(illustrationMessage, '❌ 예화 생성 중 오류 발생: ' + error.message, 'error');
+            console.error("Generate Illustrations Error:", error);
+        } finally {
+            setUIState(false); // UI 활성화
+        }
+    }
+
+    // 예화 목록 렌더링
+    function renderIllustrationList(illustrations) {
+        illustrationList.innerHTML = ''; // 기존 목록 비우기
+        if (illustrations.length === 0) {
+            illustrationList.innerHTML = '<div style="padding:10px; color:#555;">생성된 예화가 없습니다.</div>';
+            return;
+        }
+        illustrations.forEach(ill => {
+            const div = document.createElement('div');
+            div.className = 'illustration-item';
+            div.textContent = ill;
+            div.addEventListener('click', () => selectIllustration(ill));
+            illustrationList.appendChild(div);
+        });
+    }
+
+    // 예화 선택 시 설교문 작성란으로 이동 (여기서는 예화 복사만)
+    function selectIllustration(illustrationText) {
+        sermonContent.value = `[예화]\n${illustrationText}\n\n[설교 본론 시작]\n`;
+        displayMessage(illustrationMessage, '✅ 예화가 설교문 작성란으로 추가되었습니다. 이제 설교를 작성하거나 AI 설교 작성을 시도하세요.', 'info');
+        sermonContent.focus(); // 설교 작성란으로 포커스 이동
+    }
+
+    // --- AI 설교 생성 기능 (새로 추가) ---
+    async function generateSermonFromIllustration() {
+        const illustrationText = sermonContent.value.trim();
+        if (!illustrationText || illustrationText.startsWith('[예화]\n\n[설교 본론 시작]')) { // 초기 플레이스홀더 상태
+            displayMessage(illustrationMessage, '❗ 먼저 예화를 선택하거나 작성한 후 설교 생성을 시도해주세요.', 'warning');
+            return;
+        }
+
+        displayMessage(illustrationMessage, '🧠 AI가 선택된 예화를 바탕으로 설교문을 작성 중입니다. 잠시만 기다려주세요...', 'loading');
+        setUIState(true);
+
+        const prompt = `${illustrationText}\n\n위 예화 내용을 바탕으로 20분 분량의 기독교 설교문을 작성해줘. 서론, 본론(3가지 소주제), 결론을 포함하고, 성경적이며 실천적인 메시지를 담아줘.`;
+        const systemPrompt = "당신은 기독교 설교 전문가입니다. 제공된 예화를 효과적으로 활용하여 성경적이고 감동적인 설교문을 작성합니다.";
+
+        try {
+            const result = await fetch(`${backendUrl}/api/ai-process`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, systemPrompt })
+            });
+
+            if (!result.ok) {
+                const errorData = await result.json();
+                throw new Error(errorData.error || result.statusText);
+            }
+
+            const data = await result.json();
+            sermonContent.value = data.content; // 설교문 작성란에 AI 응답으로 덮어쓰기
+            displayMessage(illustrationMessage, '✅ AI 설교 작성이 완료되었습니다!', 'info');
+        } catch (error) {
+            displayMessage(illustrationMessage, '❌ 설교 생성 중 오류 발생: ' + error.message, 'error');
+            console.error("Generate Sermon Error:", error);
+        } finally {
+            setUIState(false);
+        }
+    }
+
+
+    // --- 음성 입력 기능 ---
+    function startMicForTopic() {
+        const targetInput = illustrationTopicInput;
+        if (!('webkitSpeechRecognition' in window)) {
+            displayMessage(illustrationMessage, '⚠️ 크롬 브라우저에서만 음성 입력이 지원됩니다.', 'warning');
+            return;
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'ko-KR';
+        recognition.interimResults = false; // 최종 결과만 받기
+        recognition.maxAlternatives = 1; // 하나의 대안만 받기
+
+        recognition.onstart = () => {
+            micBtnTopic.classList.add('active');
+            displayMessage(illustrationMessage, '🎤 음성 입력을 시작합니다. 말씀하세요...', 'info');
+            targetInput.value = ''; // 기존 내용 지우고 시작
+        };
+        recognition.onend = () => {
+            micBtnTopic.classList.remove('active');
+            displayMessage(illustrationMessage, '음성 입력이 종료되었습니다.', 'info');
+        };
+        recognition.onerror = (event) => {
+            displayMessage(illustrationMessage, '❌ 음성 인식 오류: ' + event.error, 'error');
+            console.error('Speech Recognition Error:', event.error);
+            micBtnTopic.classList.remove('active');
+        };
+        recognition.onresult = (event) => {
+            const text = event.results[0][0].transcript;
+            targetInput.value = text;
+            displayMessage(illustrationMessage, '✅ 음성 입력 완료: "' + text + '"', 'info');
+        };
+        
+        recognition.start();
+    }
+
+    // --- 이벤트 리스너 연결 ---
+    generateIllustrationsBtn.addEventListener('click', generateIllustrations);
+    micBtnTopic.addEventListener('click', startMicForTopic);
+    generateSermonFromIllustrationBtn.addEventListener('click', generateSermonFromIllustration); // 새로 추가된 버튼 이벤트 리스너
+
+    savePDFBtn.addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const content = sermonContent.value.trim();
+
+        if (!content) {
+            alert('저장할 설교문 내용이 없습니다.'); // alert은 사용자 정의 메시지 박스로 대체 권장
+            return;
+        }
+        
+        // 한글 폰트 문제 해결은 jspdf-autotable과 커스텀 폰트 로딩 필요
+        // 여기서는 기본 폰트 사용 (한글 깨질 수 있음)
+        const lines = doc.splitTextToSize(content, 180);
+        doc.text(lines, 10, 10);
+        doc.save('예화_설교문.pdf');
+        displayMessage(illustrationMessage, '✅ 설교문이 PDF로 저장되었습니다.', 'info');
+    });
+
+    clearSermonBtn.addEventListener('click', () => {
+      if (confirm('설교문 내용을 초기화하시겠습니까?')) { // confirm도 사용자 정의 메시지 박스 권장
+        sermonContent.value = '';
+        displayMessage(illustrationMessage, '설교문 내용이 초기화되었습니다.', 'info');
+      }
+    });
+
+    // 초기 메시지 설정
+    window.onload = () => {
+        displayMessage(illustrationMessage, 'AI가 추천할 예화가 여기에 나타납니다.', 'info');
+        sermonContent.placeholder = '선택된 예화를 바탕으로 설교문을 작성하세요...';
+    };
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설교 유형 선택</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+            background: linear-gradient(135deg, #1c1c2b, #28313b);
+            color: #f0e6d2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+        h2 {
+            color: #222;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .option-card {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            color: #333;
+            text-decoration: none; /* 링크 밑줄 제거 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+        }
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .option-card h3 {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #444;
+            font-size: 1.3rem;
+        }
+        .option-card p {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.4;
+        }
+        .option-card .icon {
+            font-size: 3rem;
+            color: #ffeb3b;
+            text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>어떤 설교를 준비하시겠습니까?</h2>
+        <div class="options-grid">
+            <a href="quickmemo-sermon.html" class="option-card">
+                <span class="icon">📝</span>
+                <h3>퀵메모 연계 설교</h3>
+                <p>간단한 아이디어로 설교 초안을 빠르게 생성합니다.</p>
+            </a>
+            <a href="expository-sermon.html" class="option-card">
+                <span class="icon">📖</span>
+                <h3>강해 설교</h3>
+                <p>성경 본문 중심의 깊이 있는 설교를 작성합니다.</p>
+            </a>
+            <a href="illustration-sermon.html" class="option-card">
+                <span class="icon">✨</span>
+                <h3>예화 중심 설교</h3>
+                <p>다양한 예화를 활용하여 설교를 풍성하게 합니다.</p>
+            </a>
+            <a href="sermon_example.html" class="option-card"> <!-- 가상의 네 번째 메뉴 -->
+                <span class="icon">💡</span>
+                <h3>자유 형식 설교</h3>
+                <p>주제와 요청에 따라 자유롭게 설교를 구성합니다.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

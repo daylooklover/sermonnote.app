@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>자유 형식 설교 작성기 (목회자용)</title>
+  <style>
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+      background: linear-gradient(135deg, #1c1c2b, #28313b);
+      margin: 0;
+      color: #f0e6d2;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* 상단 정렬 */
+      min-height: 100vh;
+      padding: 40px 20px; /* 상하좌우 패딩 추가 */
+      box-sizing: border-box;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap; /* 반응형을 위해 줄바꿈 허용 */
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 1200px; /* 전체 너비 증가 */
+      width: 100%;
+      gap: 20px; /* 컬럼 간 간격 */
+      box-sizing: border-box;
+    }
+    .column {
+      flex: 1;
+      min-width: 380px; /* 최소 너비 설정 */
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    .column.left {
+      max-width: 450px; /* 왼쪽 컬럼 너비 제한 */
+    }
+    .column.right {
+      flex: 2; /* 오른쪽 컬럼 더 넓게 */
+      background: linear-gradient(to bottom, #fff 29px, #f0f0f0 30px),
+                  url('https://www.transparenttextures.com/patterns/lined-paper.png');
+      background-size: 100% 30px;
+      background-repeat: repeat-y;
+      color: #333; /* 노트 배경에 맞춰 텍스트 색상 변경 */
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #222;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 2.2rem;
+    }
+    label {
+      color: #222;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+      margin-top: 15px;
+      font-size: 1.1rem;
+      text-align: left;
+    }
+    input[type="text"], textarea, select { /* select 태그도 스타일 적용 */
+      width: calc(100% - 24px); /* 패딩 고려 */
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      background-color: #fff;
+      color: #222;
+    }
+    textarea {
+      line-height: 30px;
+      min-height: 150px;
+      resize: vertical;
+      background: transparent; /* 부모 컬럼 배경이 보이도록 투명 설정 */
+      box-shadow: none; /* 기존 그림자 제거 (부모가 관리) */
+    }
+    #sermonOutput { /* 설교 출력 영역은 그대로 노트 배경 유지 */
+      min-height: 250px;
+      padding: 20px;
+      margin-top: 25px;
+      text-align: left;
+      white-space: pre-wrap; /* 줄 바꿈 유지 */
+      border: 1px solid #ddd;
+      line-height: 1.6;
+    }
+    #hymnRecommendationOutput { /* 찬송가 추천 영역 */
+        background: #eee;
+        color: #222;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        text-align: left;
+        min-height: 60px;
+        white-space: pre-wrap;
+        border: 1px solid #ddd;
+        font-size: 0.95rem;
+    }
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      background: #ffea00;
+      color: #222;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover:not(:disabled) {
+      background: #fff176;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+    }
+    button:disabled {
+      background: #ccc;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    #micBtn { /* 음성 입력 버튼 */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      vertical-align: middle;
+      background: #ff5252;
+      color: white;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 10px;
+      box-shadow: 0 4px 8px rgba(255, 82, 82, 0.4);
+    }
+    #micBtn.active {
+      background: #e00000;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(244,67,54,0.7); }
+      70%  { box-shadow: 0 0 0 15px rgba(244,67,54,0); }
+      100% { box-shadow: 0 0 0 0 rgba(244,67,54,0); }
+    }
+    .message-box {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #fff;
+      background-color: #555;
+      text-align: center;
+    }
+    .message-box.loading { background-color: #4a90e2; }
+    .message-box.error { background-color: #d0021b; }
+    .message-box.warning { background-color: #f5a623; }
+    .message-box.info { background-color: #333; }
+    .message-box.success { background-color: #4CAF50; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="column left">
+      <h2>✍ 설교 요청 입력</h2>
+      
+      <label for="sermonAudience">1. 설교 대상</label>
+      <select id="sermonAudience">
+        <option value="주일대예배">주일대예배</option>
+        <option value="수요예배">수요예배</option>
+        <option value="청년대학부">청년대학부</option>
+        <option value="중고등부">중고등부</option>
+        <option value="초등부">초등부</option>
+        <option value="새벽기도">새벽기도</option>
+        <option value="심방예배">심방예배</option>
+        <option value="기타">기타</option>
+      </select>
+      
+      <label for="sermonDuration">2. 설교 시간</label>
+      <select id="sermonDuration">
+        <option value="15분">15분</option>
+        <option value="20분">20분</option>
+        <option value="30분">30분</option>
+        <option value="40분">40분</option>
+        <option value="자유롭게">자유롭게</option>
+      </select>
+
+      <label for="topicInput">3. 설교 주제 또는 성경 본문</label>
+      <input type="text" id="topicInput" placeholder="예: 요한복음 3:16 또는 '하나님의 사랑'">
+      
+      <label for="instructionsTextarea">4. 원하는 설교 방향 또는 요청사항</label>
+      <textarea id="instructionsTextarea" placeholder="예: 짧은 예화 1개 포함, 적용점 3개 강조, 비유 사용 등"></textarea>
+
+      <div class="button-group">
+        <button id="generateSermonBtn">🧠 AI 설교 생성</button>
+        <button id="micBtn">🎤 음성 입력</button>
+      </div>
+      <div id="messageOutput" class="message-box">설교 생성을 위한 요청을 입력해주세요.</div>
+
+    </div>
+
+    <div class="column right">
+      <h2>📖 생성된 설교문</h2>
+      <div id="sermonOutput">✍️ 생성된 설교문이 여기에 표시됩니다</div>
+      
+      <div class="button-group">
+        <button id="recommendHymnsBtn">🎵 관련 찬송가 추천</button> <!-- 찬송가 추천 버튼 -->
+        <button id="savePDFBtn">📄 PDF 저장</button>
+        <button onclick="window.print()">🖨️ 인쇄</button>
+        <button id="clearContentBtn">🧼 내용 초기화</button>
+      </div>
+
+      <label for="hymnRecommendationOutput" style="margin-top:20px;">🎵 추천 찬송가</label>
+      <div id="hymnRecommendationOutput" class="message-box">추천 찬송가가 여기에 표시됩니다.</div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const backendUrl = 'http://localhost:3000'; // 백엔드 서버 주소
+
+    // --- DOM 요소 참조 ---
+    const sermonAudience = document.getElementById('sermonAudience');
+    const sermonDuration = document.getElementById('sermonDuration');
+    const topicInput = document.getElementById('topicInput');
+    const instructionsTextarea = document.getElementById('instructionsTextarea');
+    const generateSermonBtn = document.getElementById('generateSermonBtn');
+    const micBtn = document.getElementById('micBtn');
+    const messageOutput = document.getElementById('messageOutput');
+    const sermonOutput = document.getElementById('sermonOutput');
+    const recommendHymnsBtn = document.getElementById('recommendHymnsBtn'); // 찬송가 추천 버튼
+    const hymnRecommendationOutput = document.getElementById('hymnRecommendationOutput'); // 찬송가 추천 출력 영역
+    const savePDFBtn = document.getElementById('savePDFBtn');
+    const clearContentBtn = document.getElementById('clearContentBtn');
+
+    // --- 유틸리티 함수 ---
+
+    // UI 요소 활성화/비활성화
+    function setUIState(disabled) {
+        const interactiveElements = [
+            sermonAudience, sermonDuration, topicInput, instructionsTextarea,
+            generateSermonBtn, micBtn, recommendHymnsBtn,
+            savePDFBtn, clearContentBtn
+        ];
+        interactiveElements.forEach(el => el.disabled = disabled);
+    }
+
+    // 메시지 표시 함수
+    function displayMessage(element, message, type = 'info') {
+        element.textContent = message;
+        element.className = 'message-box ' + type;
+    }
+
+    // --- API 호출 함수 ---
+
+    // AI에게 설교 생성을 요청하는 함수
+    async function generateCustomSermon() {
+      const audience = sermonAudience.value;
+      const duration = sermonDuration.value;
+      const topic = topicInput.value.trim();
+      const instructions = instructionsTextarea.value.trim();
+      
+      if (!topic && !instructions) {
+        displayMessage(messageOutput, "❗ 설교 주제나 요청사항을 입력해주세요.", 'warning');
+        return;
+      }
+
+      displayMessage(messageOutput, "🧠 AI가 설교를 생성 중입니다. 잠시만 기다려주세요...", 'loading');
+      sermonOutput.textContent = 'AI가 설교를 생성 중입니다...'; // 이전 내용 지우기 및 로딩 메시지
+      hymnRecommendationOutput.textContent = '추천 찬송가가 여기에 표시됩니다.'; // 찬송가 초기화
+      hymnRecommendationOutput.className = 'message-box info'; // 메시지 스타일 초기화
+      setUIState(true); // UI 비활성화
+
+      const prompt = `
+설교 대상: ${audience}
+설교 시간: ${duration}
+설교 주제/본문: ${topic || "없음"}
+요청 사항: ${instructions || "없음"}
+
+위 내용을 바탕으로 설교 대상과 시간에 맞춰 기독교 설교문을 작성해줘. 서론, 본론(소주제 3개), 결론을 포함하고, 성경적이며 실천적인 메시지를 담아줘.
+`;
+      const systemPrompt = "당신은 기독교 설교문 작성 전문가입니다. 사용자의 다양한 요청과 주제에 맞춰 창의적이고 감동적인 설교문을 작성합니다.";
+
+      try {
+        const response = await fetch(`${backendUrl}/api/ai-process`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, systemPrompt, bibleReference: topic }) // 성경 구절이 있다면 백엔드에서 처리하도록 전달
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || response.statusText);
+        }
+
+        const data = await response.json();
+        sermonOutput.textContent = data.content;
+        displayMessage(messageOutput, "✅ AI 설교 생성이 완료되었습니다!", 'success');
+      } catch (error) {
+        displayMessage(messageOutput, "❌ 설교 생성 중 오류 발생: " + error.message, 'error');
+        console.error("Generate Sermon Error:", error);
+      } finally {
+        setUIState(false); // UI 활성화
+      }
+    }
+
+    // --- 찬송가 추천 기능 (새로 추가) ---
+    async function recommendHymns() {
+        const sermonText = sermonOutput.textContent.trim();
+        if (!sermonText || sermonText.includes('생성된 설교문이 여기에 표시됩니다') || sermonText.includes('AI가 설교를 생성 중입니다')) {
+            displayMessage(hymnRecommendationOutput, '❗ 찬송가 추천을 받으려면 먼저 설교문을 생성해주세요.', 'warning');
+            return;
+        }
+
+        displayMessage(hymnRecommendationOutput, '🎵 AI가 찬송가를 추천 중입니다...', 'loading');
+        setUIState(true);
+
+        const prompt = `다음 설교문의 내용과 분위기에 어울리는 찬송가 3곡을 추천해줘. 각 찬송가의 제목과 번호(있다면), 그리고 간략하게 추천 이유를 포함해줘:\n\n"${sermonText}"`;
+        const systemPrompt = "당신은 설교 내용에 맞는 찬송가를 추천하는 전문가입니다. 기독교 찬송가 목록을 기반으로 적절한 곡을 제안합니다.";
+
+        try {
+            const response = await fetch(`${backendUrl}/api/ai-process`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, systemPrompt })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || response.statusText);
+            }
+
+            const data = await response.json();
+            displayMessage(hymnRecommendationOutput, data.content, 'info'); // 'info' 스타일로 일반 텍스트 출력
+        } catch (error) {
+            displayMessage(hymnRecommendationOutput, '❌ 찬송가 추천 오류: ' + error.message, 'error');
+            console.error("Hymn Recommendation Error:", error);
+        } finally {
+            setUIState(false);
+        }
+    }
+
+
+    // --- 음성 입력 기능 ---
+    function startMic() {
+      const focusedElement = document.activeElement; // 현재 포커스된 요소
+      
+      // 텍스트 입력 필드(textarea 또는 input[type="text"])에만 적용
+      if (focusedElement && (focusedElement.tagName === 'TEXTAREA' || (focusedElement.tagName === 'INPUT' && focusedElement.type === 'text'))) {
+        if (!('webkitSpeechRecognition' in window)) {
+            displayMessage(messageOutput, '⚠️ 크롬 브라우저에서만 음성 입력이 지원됩니다.', 'warning');
+            return;
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'ko-KR'; // 한국어 설정
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+            micBtn.classList.add('active');
+            displayMessage(messageOutput, '🎤 음성 입력을 시작합니다. 말씀하세요...', 'info');
+            // focusedElement.value = ''; // 기존 내용 지우고 시작 (선택 사항)
+        };
+        recognition.onend = () => {
+            micBtn.classList.remove('active');
+            displayMessage(messageOutput, '음성 입력이 종료되었습니다.', 'info');
+        };
+        recognition.onerror = (event) => {
+            displayMessage(messageOutput, '❌ 음성 인식 오류: ' + event.error, 'error');
+            console.error('Speech Recognition Error:', event.error);
+            micBtn.classList.remove('active');
+        };
+        recognition.onresult = (event) => {
+            const text = event.results[0][0].transcript;
+            focusedElement.value += (focusedElement.value ? '\n— ' : '') + text; // 기존 내용이 있으면 줄바꿈 추가
+            displayMessage(messageOutput, '✅ 음성 입력 완료: "' + text + '"', 'info');
+        };
+        
+        recognition.start();
+      } else {
+          displayMessage(messageOutput, "음성 입력을 시작하려면 텍스트 입력 필드에 커서를 두세요.", 'warning');
+      }
+    }
+
+    // --- 이벤트 리스너 연결 ---
+    generateSermonBtn.addEventListener('click', generateCustomSermon);
+    micBtn.addEventListener('click', startMic);
+    recommendHymnsBtn.addEventListener('click', recommendHymns); // 찬송가 추천 버튼 이벤트 리스너
+
+    savePDFBtn.addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const content = sermonOutput.textContent.trim();
+        const hymnContent = hymnRecommendationOutput.textContent.trim();
+
+        let fullContent = '';
+        if (content && !content.includes('생성된 설교문이 여기에 표시됩니다') && !content.includes('AI가 설교를 생성 중입니다')) {
+            fullContent += `--- 설교문 ---\n${content}\n\n`;
+        }
+        if (hymnContent && !hymnContent.includes('추천 찬송가가 여기에 표시됩니다') && !hymnContent.includes('AI가 찬송가를 추천 중입니다') && !hymnContent.includes('찬송가 추천을 받으려면')) {
+            fullContent += `--- 추천 찬송가 ---\n${hymnContent}\n\n`;
+        }
+
+
+        if (!fullContent) {
+            displayMessage(messageOutput, '❗ 저장할 내용이 없습니다.', 'warning');
+            return;
+        }
+        
+        // 한글 폰트 문제 해결은 jspdf-autotable과 커스텀 폰트 로딩 필요
+        // 여기서는 기본 폰트 사용 (한글 깨질 수 있음)
+        const lines = doc.splitTextToSize(fullContent, 180);
+        doc.text(lines, 10, 10);
+        doc.save('자유형식_설교문.pdf');
+        displayMessage(messageOutput, '✅ 설교문이 PDF로 저장되었습니다.', 'success');
+    });
+
+    clearContentBtn.addEventListener('click', () => {
+      if (confirm('정말로 모든 내용을 초기화하시겠습니까?')) { // confirm도 사용자 정의 메시지 박스 권장
+        topicInput.value = '';
+        instructionsTextarea.value = '';
+        sermonOutput.textContent = '✍️ 생성된 설교문이 여기에 표시됩니다';
+        hymnRecommendationOutput.textContent = '추천 찬송가가 여기에 표시됩니다.';
+        displayMessage(messageOutput, '모든 내용이 초기화되었습니다.', 'info');
+        hymnRecommendationOutput.className = 'message-box info'; // 스타일 초기화
+      }
+    });
+
+    // 초기 메시지 설정
+    window.onload = () => {
+      displayMessage(messageOutput, '설교 생성을 위한 요청을 입력해주세요.', 'info');
+      displayMessage(hymnRecommendationOutput, '추천 찬송가가 여기에 표시됩니다.', 'info'); // 초기 메시지
+    };
+  </script>
+</body>
+</html>

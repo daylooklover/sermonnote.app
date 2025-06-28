@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>퀵메모 설교 작성기 (목회자용)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+  body {
+    margin: 0;
+    padding: 40px 20px; /* 상하좌우 패딩 추가 */
+    font-family: 'Nanum Gothic', sans-serif;
+    background: linear-gradient(135deg, #1c1c2b, #28313b);
+    color: #f0e6d2;
+    min-height: 100vh;
+    display: flex; /* 중앙 정렬을 위해 추가 */
+    justify-content: center;
+    align-items: flex-start; /* 상단 정렬 */
+    box-sizing: border-box;
+  }
+
+  h2 {
+    text-align: center;
+    color: #ffeb3b;
+    text-shadow: 0 0 8px #ffd54f;
+    margin-bottom: 30px;
+  }
+
+  .container {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.95); /* 컨테이너 배경색 추가 */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    max-width: 1200px; /* 최대 너비 설정 */
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .left {
+    flex: 1;
+    min-width: 300px;
+    max-width: 380px;
+    padding: 20px; /* 내부 패딩 추가 */
+    background: #f9f9f9; /* 배경색 추가 */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+  }
+
+  .right {
+    flex: 2;
+    min-width: 500px; /* 최소 너비 설정 */
+    /* 설교문 작성 배경을 노트 이미지로 변경 */
+    background: linear-gradient(to bottom, #fff 29px, #f0f0f0 30px),
+                url('https://www.transparenttextures.com/patterns/lined-paper.png');
+    background-size: 100% 30px;
+    background-repeat: repeat-y;
+    color: #333; /* 노트 배경에 맞춰 텍스트 색상 변경 */
+    border-radius: 10px; /* 기존 둥근 모서리 유지 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* 기존 그림자 유지 */
+    padding: 20px; /* 기존 패딩 유지 */
+    box-sizing: border-box;
+  }
+
+  #quickmemoSearch {
+    width: calc(100% - 20px); /* 패딩 고려 */
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: none;
+    background: #fff; /* 밝은 배경색 */
+    color: #222; /* 텍스트 색상 */
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.3) inset;
+    margin-bottom: 10px;
+  }
+
+  #quickmemoList {
+    background: #fff; /* 밝은 배경색 */
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+    padding: 10px;
+    max-height: 300px; /* 높이 약간 증가 */
+    overflow-y: auto;
+    color: #333;
+  }
+
+  .quickmemo-item {
+    padding: 12px 14px; /* 패딩 증가 */
+    margin-bottom: 8px;
+    background: #f0f0f0; /* 밝은 배경 */
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    transition: background-color 0.2s, color 0.2s;
+    word-break: break-word; /* 긴 단어 줄바꿈 */
+  }
+
+  .quickmemo-item.selected {
+    background-color: #ffeb3b;
+    color: #222;
+    font-weight: 700;
+    border-left: 6px solid #fbc02d;
+  }
+  .quickmemo-item:hover {
+    background-color: #e0e0e0;
+  }
+
+  #sermonContent {
+    width: 100%;
+    min-height: 400px; /* 높이 증가 */
+    padding: 20px;
+    font-size: 1.1rem;
+    line-height: 32px;
+    color: #222; /* 노트 배경에 맞게 텍스트 색상 변경 */
+    background: transparent; /* 부모 컬럼 배경이 보이도록 투명 설정 */
+    border-radius: 12px; /* 기존 둥근 모서리 유지 */
+    border: 1px solid #ddd;
+    box-shadow: none; /* 기존 그림자 제거 (부모가 관리) */
+    box-sizing: border-box;
+    resize: vertical;
+  }
+
+  .btn-row {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  button {
+    padding: 10px 20px;
+    border-radius: 14px;
+    border: none;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    background: #ffea00;
+    color: #222;
+    transition: 0.2s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  button:hover:not(:disabled) {
+    background: #fff176;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  }
+
+  button:disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  .message-box {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #fff;
+    background-color: #555;
+    text-align: center;
+  }
+  .message-box.loading { background-color: #4a90e2; }
+  .message-box.error { background-color: #d0021b; }
+  .message-box.warning { background-color: #f5a623; }
+  .message-box.success { background-color: #4CAF50; }
+</style>
+</head>
+<body>
+
+<h2>✍ 퀵메모 설교 작성기 (목회자용)</h2>
+
+<div class="container">
+  <!-- Left: Quick Memo -->
+  <div class="left">
+    <input type="text" id="quickmemoSearch" placeholder="🔍 퀵메모 검색...">
+    <div id="quickmemoList"></div>
+    <div id="quickmemoMessage" class="message-box">메모를 선택하면 설교 작성을 시작합니다.</div>
+  </div>
+
+  <!-- Right: Sermon Editor -->
+  <div class="right">
+    <textarea id="sermonContent" placeholder="선택된 퀵메모를 바탕으로 설교문이 작성됩니다..."></textarea>
+
+    <div class="btn-row">
+      <button id="generateSermonBtn">🧠 설교 자동 작성</button>
+      <button id="addCommentaryBtn">📌 주석 달기</button>
+      <button id="savePDFBtn">📄 PDF 저장</button>
+      <button onclick="window.print()">🖨️ 인쇄</button>
+      <button id="clearContentBtn">🧼 내용 초기화</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const backendUrl = 'http://localhost:3000'; // 백엔드 서버 주소
+
+const quickmemoList = document.getElementById('quickmemoList');
+const quickmemoSearchInput = document.getElementById('quickmemoSearch');
+const sermonContent = document.getElementById('sermonContent');
+const generateSermonBtn = document.getElementById('generateSermonBtn');
+const addCommentaryBtn = document.getElementById('addCommentaryBtn');
+const savePDFBtn = document.getElementById('savePDF');
+const clearContentBtn = document.getElementById('clearContentBtn');
+const quickmemoMessage = document.getElementById('quickmemoMessage'); // 메시지 박스
+
+let quickmemos = [];
+let selectedIndex = null;
+
+// UI 요소 활성화/비활성화
+function setUIState(disabled) {
+    const interactiveElements = [
+        quickmemoSearchInput, generateSermonBtn, addCommentaryBtn, savePDFBtn, clearContentBtn, sermonContent
+    ];
+    interactiveElements.forEach(el => el.disabled = disabled);
+}
+
+// 메시지 표시 함수
+function displayMessage(element, message, type = 'info') {
+    element.textContent = message;
+    element.className = 'message-box ' + type;
+}
+
+// 백엔드에서 퀵메모를 가져오는 함수
+async function fetchQuickMemos() {
+  displayMessage(quickmemoMessage, '  퀵메모를 불러오는 중...', 'loading');
+  setUIState(true);
+  try {
+    const response = await fetch(`${backendUrl}/api/memos`);
+    if (!response.ok) {
+        throw new Error('메모 불러오기 실패: ' + response.statusText);
+    }
+    quickmemos = await response.json();
+    renderList(quickmemos);
+    displayMessage(quickmemoMessage, '메모를 선택하면 설교 작성을 시작합니다.', 'info');
+  } catch (error) {
+    displayMessage(quickmemoMessage, '❌ 퀵메모 불러오기 오류: ' + error.message, 'error');
+    console.error('Fetch Quick Memos Error:', error);
+  } finally {
+    setUIState(false);
+  }
+}
+
+// 퀵메모 목록을 화면에 렌더링하는 함수
+function renderList(list) {
+  quickmemoList.innerHTML = "";
+  if (list.length === 0) {
+    quickmemoList.innerHTML = '<div style="padding:10px; text-align:center; color:#555;">표시할 퀵메모가 없습니다.</div>';
+    return;
+  }
+  list.forEach((item, idx) => {
+    const div = document.createElement("div");
+    div.textContent = item;
+    div.className = "quickmemo-item";
+    if (idx === selectedIndex) div.classList.add("selected");
+    div.dataset.idx = idx;
+    div.addEventListener("click", () => {
+      selectedIndex = idx;
+      renderList(quickmemos); // 선택 상태 업데이트를 위해 목록 다시 렌더링
+      sermonContent.value = item + '\n\n'; // 선택된 메모를 설교 내용에 표시하고 두 줄 띄우기
+      displayMessage(quickmemoMessage, '✅ 퀵메모가 설교문에 추가되었습니다.', 'info');
+    });
+    quickmemoList.appendChild(div);
+  });
+}
+
+// 백엔드를 통해 AI와 통신하는 함수
+async function callAI(prompt, systemPrompt) {
+    setUIState(true); // UI 비활성화
+    displayMessage(quickmemoMessage, '🧠 AI가 설교/주석을 작성 중입니다. 잠시만 기다려주세요...', 'loading');
+    try {
+        const response = await fetch(`${backendUrl}/api/ai-process`, { // 백엔드 서버의 /api/ai-process 엔드포인트 호출
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, systemPrompt })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || response.statusText);
+        }
+
+        const data = await response.json();
+        displayMessage(quickmemoMessage, '✅ AI 작성이 완료되었습니다!', 'info');
+        return data.content; // 백엔드에서 받은 AI 응답 내용 반환
+    } catch (error) {
+        displayMessage(quickmemoMessage, '❌ AI 작성 중 오류 발생: ' + error.message, 'error');
+        console.error('Call AI Error:', error);
+        return ""; // 오류 발생 시 빈 문자열 반환
+    } finally {
+        setUIState(false); // UI 활성화
+    }
+}
+
+// 설교 자동 작성 버튼 클릭 이벤트
+generateSermonBtn.addEventListener('click', async () => {
+  const sermonText = sermonContent.value.trim(); // 현재 설교 내용 가져오기
+  if (!sermonText) {
+    displayMessage(quickmemoMessage, '❗ 설교를 생성할 내용이 없습니다. 퀵메모를 선택하거나 직접 입력해주세요.', 'warning');
+    return;
+  }
+  
+  const result = await callAI(
+    `${sermonText} 내용을 바탕으로 20분 분량의 기독교 설교문을 써줘. 서론, 본론(소주제 3개), 결론을 포함해.`,
+    "당신은 성경적 통찰을 주는 설교문 작성 도우미입니다. 목회자를 위해 명확하고 감동적인 설교문을 작성합니다."
+  );
+  if (result) {
+    sermonContent.value = result;
+  }
+});
+
+// 주석 달기 버튼 클릭 이벤트
+addCommentaryBtn.addEventListener('click', async () => {
+  const sermonText = sermonContent.value.trim();
+  if (!sermonText || sermonText.startsWith('선택된 퀵메모를 바탕으로')) { // 플레이스홀더 상태도 확인
+    displayMessage(quickmemoMessage, '❗ 주석을 달 설교문이 비어 있습니다.', 'warning');
+    return;
+  }
+
+  const result = await callAI(
+    `${sermonText} 이 설교문에 문단별로 성경적, 신학적 배경을 포함한 주석을 달아줘. 주석은 본문 아래에 [주석:] 형태로 추가해줘.`,
+    "당신은 신학적으로 깊이 있는 성경 주석가입니다. 설교문의 의미를 풍부하게 하는 주석을 작성합니다."
+  );
+  if (result) {
+    sermonContent.value = result;
+  }
+});
+
+// 퀵메모 검색 입력 이벤트
+quickmemoSearchInput.addEventListener('input', () => {
+  const keyword = quickmemoSearchInput.value.trim();
+  const filtered = keyword ? quickmemos.filter(m => m.includes(keyword)) : quickmemos;
+  selectedIndex = null; // 검색 시 선택 해제
+  sermonContent.value = ''; // 검색 시 내용 초기화
+  renderList(filtered);
+  displayMessage(quickmemoMessage, '검색 결과가 표시되었습니다.', 'info');
+});
+
+// PDF 저장 기능
+savePDFBtn.addEventListener('click', () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const content = sermonContent.value.trim();
+
+  if (!content) {
+    displayMessage(quickmemoMessage, '❗ 저장할 설교문 내용이 없습니다.', 'warning');
+    return;
+  }
+
+  // 한글 지원을 위해서는 jspdf-autotable과 커스텀 폰트 로딩 필요
+  // 여기서는 기본 폰트 사용 (한글 깨질 수 있음)
+  const lines = doc.splitTextToSize(content, 180);
+  let y = 10;
+  const lineHeight = 7;
+
+  lines.forEach(line => {
+    if (y > 280) {
+      doc.addPage();
+      y = 10;
+    }
+    doc.text(line, 10, y);
+    y += lineHeight;
+  });
+
+  doc.save('퀵메모_설교문.pdf');
+  displayMessage(quickmemoMessage, '✅ 설교문이 PDF로 저장되었습니다.', 'info');
+});
+
+// 내용 초기화 버튼 클릭 이벤트
+clearContentBtn.addEventListener('click', () => {
+  if (confirm('정말로 설교문 내용을 초기화하시겠습니까?')) { // confirm 대신 사용자 정의 모달 사용 권장
+    sermonContent.value = '';
+    selectedIndex = null;
+    renderList(quickmemos); // 선택 해제 후 목록 다시 렌더링
+    displayMessage(quickmemoMessage, '설교문 내용이 초기화되었습니다.', 'info');
+  }
+});
+
+// 페이지 로드 시 퀵메모 불러오기
+window.onload = () => {
+    fetchQuickMemos();
+    // 퀵메모 10개 제한은 현재 백엔드(server.js)의 quickmemosData 배열이 정적이라 직접 적용하기 어려움.
+    // 실제 사용자 메모를 저장하는 기능(예: Firestore)이 추가되면 백엔드에서 제한을 관리해야 함.
+    // 여기서는 메시지 박스를 초기화함
+    displayMessage(quickmemoMessage, '메모를 선택하면 설교 작성을 시작합니다.', 'info');
+};
+</script>
+
+</body>
+</html>
+ 
