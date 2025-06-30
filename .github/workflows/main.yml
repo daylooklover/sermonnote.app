@@ -24,4 +24,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: sermonnote.app
-          publicDir: public # <-- 이 줄을 추가하여 'public' 폴더를 배포 대상으로 명시
+          entrypoint: public # <-- publicDir 대신 entrypoint 사용
