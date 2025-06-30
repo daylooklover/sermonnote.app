@@ -3,10 +3,10 @@ name: Deploy to Firebase Hosting
 on:
   push:
     branches:
-      - main
+      - main # 현재 main 브랜치이므로 이렇게 유지합니다.
 
 jobs:
-  build:
+  deploy: # Job 이름을 'build'에서 'deploy'로 변경하여 혼동을 줄입니다.
     name: Deploy
     runs-on: ubuntu-latest
 
@@ -14,16 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build
+      # Setup Node.js, Install dependencies, Build project 단계를 제거합니다.
+      # 이 부분들은 필요하지 않다고 가정합니다.
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
@@ -32,3 +24,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: sermonnote.app
+          publicDir: public # <-- 이 줄을 추가하여 'public' 폴더를 배포 대상으로 명시
