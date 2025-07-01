@@ -14,8 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setup Node.js, Install dependencies, Build project 단계를 제거합니다.
-      # 이 부분들은 필요하지 않다고 가정합니다.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4 # <-- Node.js 설정 단계 다시 추가
+        with:
+          node-version: '20'
+
+      - name: Install dependencies # <-- 의존성 설치 단계 다시 추가
+        run: npm install
+
+      # 'Build project' 단계는 여전히 필요 없으므로 제거된 상태로 둡니다.
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0.9.0
@@ -24,4 +31,3 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: sermonnote.app
-          # entrypoint: public # <-- 이 라인을 제거합니다!
