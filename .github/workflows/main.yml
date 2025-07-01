@@ -3,10 +3,10 @@ name: Deploy to Firebase Hosting
 on:
   push:
     branches:
-      - main # 현재 main 브랜치이므로 이렇게 유지합니다.
+      - main
 
 jobs:
-  deploy: # Job 이름을 'build'에서 'deploy'로 변경하여 혼동을 줄입니다.
+  deploy:
     name: Deploy
     runs-on: ubuntu-latest
 
@@ -24,4 +24,15 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: sermonnote.app
-          entrypoint: public # <-- publicDir 대신 entrypoint 사용
+          # publicDir: public 또는 entrypoint: public # 이전에 사용했던 옵션은 제거합니다.
+
+        env: # <-- 이 부분을 새로 추가합니다.
+          FIREBASE_CLI_APP_DIR: '.' # <-- firebase.json이 있는 저장소 루트 경로를 명시
+
+      - name: Verify firebase.json existence # <-- 이 단계를 추가하여 파일 존재를 확인해 봅니다.
+        run: |
+          ls -al
+          if [ ! -f "firebase.json" ]; then
+            echo "firebase.json not found in the root directory!"
+            exit 1
+          fi
