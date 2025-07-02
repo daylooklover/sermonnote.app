@@ -1,230 +1,1534 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>SermonNote - 성경 구절</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Nanum Myeongjo, Nanum Gothic 폰트 추가 -->
-  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      background-color: #111;
-      color: #eee;
-      font-family: 'Nanum Gothic', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-    }
-    #topLeftText {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      max-width: 320px;
-      padding: 12px 18px;
-      background-color: rgba(0, 0, 0, 0.5);
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(255, 215, 79, 0.85);
-      color: white;
-      font-family: 'Nanum Myeongjo', serif;
-      font-size: 1.15rem;
-      font-weight: 600;
-      line-height: 1.5;
-      letter-spacing: 0.07em;
-      text-shadow:
-        0 0 6px rgba(255, 224, 130, 0.9),
-        0 0 10px rgba(255, 196, 0, 0.7);
-      user-select: none;
-      z-index: 10000;
-      transition: color 0.3s ease;
-    }
-    #topLeftText strong {
-      font-weight: 800;
-      color: #FFF8E1;
-      text-shadow: 0 0 8px #fffacd;
-    }
-    #topLeftText:hover {
-      color: #FFD740;
-      text-shadow:
-        0 0 10px #fff176,
-        0 0 18px #ffc400;
-    }
-    #title {
-      font-size: 5rem;
-      font-weight: 800;
-      margin: 0 0 24px 0;
-      user-select: none;
-      font-family: 'Nanum Gothic', sans-serif;
-      text-shadow: 0 0 8px #444;
-      color: #ddd;
-    }
-    #verseBox {
-      font-size: 1.5rem;
-      padding: 22px 28px;
-      border-radius: 14px;
-      background-color: #222;
-      box-shadow: 0 0 25px #ffeb3b88;
-      max-width: 700px;
-      min-height: 120px;
-      line-height: 1.6;
-      margin-bottom: 36px;
-      user-select: text;
-      transition: background-color 0.3s ease;
-      font-family: 'Nanum Gothic', sans-serif;
-      color: #fff;
-      text-align: center;
-    }
-    #verseBox span {
-      display: block;
-      font-size: 1rem;
-      color: #ccc;
-      margin-top: 10px;
-      font-style: italic;
-      user-select: text;
-    }
-    button {
-      background-color: #ffeb3b;
-      color: #222;
-      font-size: 1.8rem;
-      padding: 18px 60px;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      box-shadow: 0 0 25px #fdd835bb;
-      user-select: none;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      font-family: 'Nanum Gothic', sans-serif;
-      font-weight: 700;
-      margin: 0 10px 20px 10px;
-    }
-    button:hover {
-      background-color: #fdd835;
-      box-shadow: 0 0 35px #fdd835ee;
-    }
-    #quickMemoBtn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #ffcc80;
-      color: #222;
-      font-size: 1.4rem;
-      font-weight: bold;
-      padding: 14px 28px;
-      border-radius: 50px;
-      box-shadow: 0 5px 15px rgba(255, 204, 128, 0.8);
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-      border: none;
-      z-index: 1000;
-      font-family: 'Nanum Gothic', sans-serif;
-    }
-    #quickMemoBtn:hover {
-      background: linear-gradient(90deg, #ffd180, #ffb74d);
-      box-shadow: 0 7px 25px rgba(255, 183, 77, 1);
-    }
-    #getStartedBtn {
-      background-color: #64b5f6;
-      color: white;
-      font-size: 1.8rem;
-      padding: 18px 60px;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      box-shadow: 0 0 25px #64b5f6bb;
-      user-select: none;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      font-family: 'Nanum Gothic', sans-serif;
-      font-weight: 700;
-      margin: 20px 10px 0 10px;
-    }
-    #getStartedBtn:hover {
-      background-color: #42a5f5;
-      box-shadow: 0 0 35px #42a5f5ee;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말씀 노트 앱</title>
+    <script src="https://cdn.tailwindcss.com" onerror="console.error('Tailwind CSS CDN 로드 실패');"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" onerror="console.error('React CDN 로드 실패');"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" onerror="console.error('ReactDOM CDN 로드 실패');"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js" onerror="console.error('Babel CDN 로드 실패');"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* Inter 폰트 정의 (Google Fonts) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        /* Nanum Gothic 폰트 정의 (말씀 선택 화면용) */
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* 다크 배경 */
+            color: #e2e8f0; /* 밝은 텍스트 */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* 전체적인 패딩 */
+            margin: 0;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+        }
+
+        /* 커스텀 스크롤바 (퀵메모용) */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #2d3748;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #606b7d;
+        }
+
+        /* 퀵메모 입력 필드 높이 */
+        textarea#new-memo-text {
+            min-height: 80px; /* 최소 높이 */
+            resize: vertical; /* 세로 방향으로만 크기 조절 가능 */
+        }
+
+        /* 말씀 선택 화면 스타일 (기존 style 태그에서 가져옴) */
+        .sermon-selection-container {
+            font-family: 'Nanum Gothic', sans-serif; /* 이 화면에만 나눔고딕 적용 */
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            color: #222; /* 폰트 색상 조정 */
+        }
+        .sermon-selection-container h2 {
+            color: #222;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .sermon-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .sermon-option-card {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            color: #333;
+            text-decoration: none; /* 링크 밑줄 제거 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+        }
+        .sermon-option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .sermon-option-card h3 {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #444;
+            font-size: 1.3rem;
+        }
+        .sermon-option-card p {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.4;
+        }
+        .sermon-option-card .icon {
+            font-size: 3rem;
+            color: #ffeb3b;
+            text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);
+        }
+
+        /* 설교 작성 화면 (새로운 템플릿 CSS) */
+        .sermon-creation-container-new {
+            margin: 0;
+            padding: 40px 20px; /* 상하좌우 패딩 추가 */
+            font-family: 'Nanum Gothic', sans-serif;
+            background: linear-gradient(135deg, #1c1c2b, #28313b);
+            color: #f0e6d2;
+            min-height: 100vh;
+            display: flex; /* 중앙 정렬을 위해 추가 */
+            flex-direction: column; /* 세로 정렬 */
+            justify-content: flex-start; /* 상단 정렬 */
+            align-items: center; /* 중앙 정렬 */
+            box-sizing: border-box;
+            width: 100%; /* 부모에 맞게 너비 설정 */
+            max-width: 1400px; /* 더 넓게 설정 */
+        }
+        .sermon-creation-container-new h2 {
+            text-align: center;
+            color: #ffeb3b;
+            text-shadow: 0 0 8px #ffd54f;
+            margin-bottom: 30px;
+        }
+        .sermon-panels-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap; /* 반응형을 위해 추가 */
+            justify-content: center;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.95); /* 컨테이너 배경색 추가 */
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 1200px; /* 최대 너비 설정 */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sermon-left-panel {
+            flex: 1;
+            min-width: 300px;
+            max-width: 380px;
+            padding: 20px; /* 내부 패딩 추가 */
+            background: #f9f9f9; /* 배경색 추가 */
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            color: #222; /* 텍스트 색상 */
+        }
+
+        .sermon-right-panel {
+            flex: 2;
+            min-width: 500px; /* 최소 너비 설정 */
+            /* 설교문 작성 배경을 노트 이미지로 변경 */
+            background: linear-gradient(to bottom, #fff 29px, #f0f0f0 30px),
+                        url('https://www.transparenttextures.com/patterns/lined-paper.png');
+            background-size: 100% 30px;
+            background-repeat: repeat-y;
+            color: #333; /* 노트 배경에 맞춰 텍스트 색상 변경 */
+            border-radius: 10px; /* 기존 둥근 모서리 유지 */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* 기존 그림자 유지 */
+            padding: 20px; /* 기존 패딩 유지 */
+            box-sizing: border-box;
+            display: flex; /* 내부 요소 정렬을 위해 flex 추가 */
+            flex-direction: column; /* 세로 정렬 */
+        }
+
+        .quickmemo-search-input {
+            width: calc(100% - 20px); /* 패딩 고려 */
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 10px;
+            border: none;
+            background: #fff; /* 밝은 배경색 */
+            color: #222; /* 텍스트 색상 */
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.3) inset;
+            margin-bottom: 10px;
+        }
+
+        .quickmemo-list-area {
+            background: #fff; /* 밝은 배경색 */
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+            padding: 10px;
+            max-height: 300px; /* 높이 약간 증가 */
+            overflow-y: auto;
+            color: #333;
+        }
+
+        .quickmemo-item {
+            padding: 12px 14px; /* 패딩 증가 */
+            margin-bottom: 8px;
+            background: #f0f0f0; /* 밝은 배경 */
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: background-color 0.2s, color 0.2s;
+            word-break: break-word; /* 긴 단어 줄바꿈 */
+        }
+
+        .quickmemo-item.selected {
+            background-color: #ffeb3b;
+            color: #222;
+            font-weight: 700;
+            border-left: 6px solid #fbc02d;
+        }
+        .quickmemo-item:hover {
+            background-color: #e0e0e0;
+        }
+
+        .sermon-content-textarea {
+            width: 100%;
+            min-height: 400px; /* 높이 증가 */
+            padding: 20px;
+            font-size: 1.1rem;
+            line-height: 32px;
+            color: #222; /* 노트 배경에 맞게 텍스트 색상 변경 */
+            background: transparent; /* 부모 컬럼 배경이 보이도록 투명 설정 */
+            border-radius: 12px; /* 기존 둥근 모서리 유지 */
+            border: 1px solid #ddd;
+            box-shadow: none; /* 기존 그림자 제거 (부모가 관리) */
+            box-sizing: border-box;
+            resize: vertical;
+            flex-grow: 1; /* 남은 공간을 채우도록 설정 */
+            margin-bottom: 15px; /* 버튼과의 간격 */
+        }
+
+        .sermon-btn-row {
+            margin-top: 0; /* 기존 템플릿의 마진 제거 */
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%; /* 버튼 행 너비 설정 */
+        }
+
+        .sermon-btn {
+            padding: 10px 20px;
+            border-radius: 14px;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            background: #ffea00;
+            color: #222;
+            transition: 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .sermon-btn:hover:not(:disabled) {
+            background: #fff176;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .sermon-btn:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .message-box {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #fff;
+            background-color: #555;
+            text-align: center;
+        }
+        .message-box.loading { background-color: #4a90e2; }
+        .message-box.error { background-color: #d0021b; }
+        .message-box.warning { background-color: #f5a623; }
+        .message-box.success { background-color: #4CAF50; }
+
+        /* 반응형 조정 */
+        @media (max-width: 768px) {
+            .sermon-panels-container {
+                flex-direction: column;
+            }
+            .sermon-left-panel, .sermon-right-panel {
+                min-width: unset;
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <div id="topLeftText">
-    AI와 함께<br/>
-    하나님의 말씀을<br/>
-    더 가까이, 더 깊게<br/>
-    전하는 사역 플랫폼 -&nbsp;
-    <span id="platformLink" style="
-      color: #ffd54f;
-      cursor: pointer;
-      text-decoration: underline;
-    ">
-      말씀노트
-    </span>
-    <div id="infoBox" style="display:none; margin-top: 12px; font-size: 0.9rem; color: #fff;">
-      <p>말씀노트는 AI 기술과 신앙 콘텐츠가 융합된 국내 최초 설교 작성 플랫폼입니다.</p>
-      <p>설교 준비를 효율적으로 돕고, 말씀 나눔을 지원합니다.</p>
+    <div id="root" class="w-full h-full flex justify-center items-center">
+        <p class="text-white text-lg">앱을 로드하는 중... (문제가 발생하면 개발자 도구 콘솔을 확인해주세요)</p>
     </div>
-  </div>
 
-  <h1 id="title">sermonnote</h1>
+    <script type="text/babel">
+        console.log("React 앱 스크립트가 실행되고 있습니다. Babel을 통해 JSX 변환 시도 중...");
 
-  <div id="verseBox"></div>
+        const { useState, useEffect, useRef } = React;
+        const MAX_MEMOS = 5;
 
-  <button id="getStartedBtn" title="시작하기">Get Started</button>
+        // Firebase 설정
+        // Canvas 환경에서 제공되는 전역 변수들
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyCpnQe0avt9Rzt69xScI43MyyXxslt6Ff8", // 사용자님이 제공해주신 API Key
+            authDomain: "sermonnote-live.firebaseapp.com",
+            projectId: "sermonnote-live",
+        };
 
-  <button id="quickMemoBtn" title="퀵메모로 이동">✍ 퀵메모</button>
+        // 50개의 성경 구절 (한국어/영어) 목록
+        const bibleVerses = [
+            { kor: "하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라", eng: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.", ref: "요한복음 3:16" },
+            { kor: "그런즉 너희는 먼저 그의 나라와 그의 의를 구하라 그리하면 이 모든 것을 너희에게 더하시리라", eng: "But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.", ref: "마태복음 6:33" },
+            { kor: "여호와는 나의 목자시니 내게 부족함이 없으리로다", eng: "The Lord is my shepherd; I shall not want.", ref: "시편 23:1" },
+            { kor: "내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라", eng: "I can do all things through Christ which strengtheneth me.", ref: "빌립보서 4:13" },
+            { kor: "우리가 알거니와 하나님을 사랑하는 자 곧 그의 뜻대로 부르심을 입은 자들에게는 모든 것이 합력하여 선을 이루느니라", eng: "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.", ref: "로마서 8:28" },
+            { kor: "예수께서 이르시되 내가 곧 길이요 진리요 생명이니 나로 말미암지 않고는 아버지께로 올 자가 없느느리라", eng: "Jesus saith unto him, I am the way, the truth, and the life: no man cometh unto the Father, but by me.", ref: "요한복음 14:6" },
+            { kor: "두려워하지 말라 내가 너와 함께 함이라 놀라지 말라 나는 네 하나님이 됨이라 내가 너를 굳세게 하리라 참으로 너를 도와주리라 참으로 나의 의로운 오른손으로 너를 붙들리라", eng: "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.", ref: "이사야 41:10" },
+            { kor: "오직 여호와를 앙망하는 자는 새 힘을 얻으리니 독수리가 날개치며 올라감 같을 것이요 달음박질하여도 곤비하지 아니하겠고 걸어가도 피곤하지 아니하리로다", eng: "But those who hope in the LORD will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.", ref: "이사야 40:31" },
+            { kor: "사랑은 오래 참고 사랑은 온유하며 시기하지 아니하며 사랑은 자랑하지 아니하며 교만하지 아니하며", eng: "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up,", ref: "고린도전서 13:4" },
+            { kor: "아무것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라", eng: "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.", ref: "빌립보서 4:6" },
+            { kor: "그가 내 이름을 아는 고로 내가 저를 높이리라 저가 내게 간구하리니 내가 응답하리라 저희 환난 때에 내가 저와 함께 하여 저를 건지고 영화롭게 하리라", eng: "Because he loves me, says the LORD, I will rescue him; I will protect him, for he acknowledges my name. He will call on me, and I will answer him; I will be with him in trouble, I will deliver him and honor him.", ref: "시편 91:14-15" },
+            { kor: "모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라", eng: "And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.", ref: "빌립보서 4:7" },
+            { kor: "태초에 하나님이 천지를 창조하시니라", eng: "In the beginning God created the heavens and the earth.", ref: "창세기 1:1" },
+            { kor: "또 내가 너희에게 이르노니 구하라 그러면 너희에게 주실 것이요 찾으라 그러면 찾을 것이요 문을 두드리라 그러면 너희에게 열릴 것이니", eng: "So I say to you: Ask and it will be given to you; seek and you will find; knock and the door will be opened to you.", ref: "누가복음 11:9" },
+            { kor: "내가 세상 끝날까지 너희와 항상 함께 있으리라 하시니라", eng: "And surely I am with you always, to the very end of the age.", ref: "마태복음 28:20" },
+            { kor: "주를 경외하는 것이 지혜의 근본이요 거룩하신 자를 아는 것이 명철이니라", eng: "The fear of the LORD is the beginning of wisdom, and knowledge of the Holy One is understanding.", ref: "잠언 9:10" },
+            { kor: "하나님이여 사슴이 시냇물을 찾기에 갈급함 같이 내 영혼이 주를 찾기에 갈급하니이다", eng: "As the deer pants for streams of water, so my soul pants for you, O God.", ref: "시편 42:1" },
+            { kor: "내 평생에 선하심과 인자하심이 반드시 나를 따르리니 내가 여호와의 집에 영원히 살리로다", eng: "Surely goodness and love will follow me all the days of my life, and I will dwell in the house of the LORD forever.", ref: "시편 23:6" },
+            { kor: "믿음이 없이는 하나님을 기쁘시게 하지 못하나니 하나님께 나아가는 자는 반드시 그가 계신 것과 또한 그가 자기를 찾는 자들에게 상 주시는 이심을 믿어야 할지니라", eng: "And without faith it is impossible to please God, because anyone who comes to him must believe that he exists and that he rewards those who earnestly seek him.", ref: "히브리서 11:6" },
+            { kor: "그가 시험을 받아 고난을 당하셨은즉 시험 받는 자들을 능히 도우실 수 있느니라", eng: "Because he himself suffered when he was tempted, he is able to help those who are being tempted.", ref: "히브리서 2:18" },
+            { kor: "내 생각은 너희 생각과 다르며 내 길은 너희 길과 다름이니라 여호와의 말씀이니라", eng: "'For my thoughts are not your thoughts, neither are your ways my ways,' declares the LORD.", ref: "이사야 55:8" },
+            { kor: "이는 내게 사는 것이 그리스도니 죽는 것도 유익함이라", eng: "For to me, to live is Christ and to die is gain.", ref: "빌립보서 1:21" },
+            { kor: "주의 말씀은 내 발에 등이요 내 길에 빛이니이다", eng: "Your word is a lamp for my feet, a light on my path.", ref: "시편 119:105" },
+            { kor: "수고하고 무거운 짐 진 자들아 다 내게로 오라 내가 너희를 쉬게 하리라", eng: "Come to me, all you who are weary and burdened, and I will give you rest.", ref: "마태복음 11:28" },
+            { kor: "항상 기뻐하라 쉬지 말고 기도하라 범사에 감사하라 이것이 그리스도 예수 안에서 너희를 향하신 하나님의 뜻이니라", eng: "Rejoice always, pray continually, give thanks in all circumstances; for this is God’s will for you in Christ Jesus.", ref: "डेसलोनिकी 1 5:16-18" },
+            { kor: "여호와를 의지하고 선을 행하라 땅에 머무는 동안 그의 성실을 먹을 거리로 삼을지어다", eng: "Trust in the LORD and do good; dwell in the land and enjoy safe pasture.", ref: "भजन संहिता 37:3" },
+            { kor: "그가 모든 눈물을 그 눈에서 닦아 주시니 다시는 사망이 없고 애통하는 것이나 곡하는 것이나 아픈 것이 다시 있지 아니하리니 처음 것들이 다 지나갔음이러라", eng: "He will wipe every tear from their eyes. There will be no more death or mourning or crying or pain, for the old order of things has passed away.", ref: "प्रकाशितवाक्य 21:4" },
+            { kor: "내가 네게 명령한 것이 아니냐 강하고 담대하라 두려워하지 말며 놀라지 말라 네가 어디로 가든지 네 하나님 여호와가 너와 함께 하느니라 하시니라", eng: "Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the LORD your God will be with you wherever you go.", ref: "यहोशू 1:9" },
+            { kor: "사람이 마음으로 자기의 길을 계획할지라도 그의 걸음을 인도하시는 이는 여호와시니라", eng: "In their hearts humans plan their course, but the LORD establishes their steps.", ref: "नीतिवचन 16:9" },
+            { kor: "아들을 낳으리니 이름을 예수라 하라 이는 그가 자기 백성을 그들의 죄에서 구원할 자이심이라 하니라", eng: "She will give birth to a son, and you are to give him the name Jesus, because he will save his people from their sins.", ref: "मत्ती 1:21" },
+            { kor: "하나님의 말씀은 살아 있고 활력이 있어 좌우에 날선 어떤 검보다도 예리하여 혼과 영과 및 관절과 골수를 찔러 쪼개기까지 하며 또 마음의 생각과 뜻을 판단하나니", eng: "For the word of God is alive and active. Sharper than any double-edged edged sword, it penetrates even to dividing soul and spirit, joints and marrow; it judges the thoughts and attitudes of the heart.", ref: "इब्रानियों 4:12" },
+            { kor: "내가 사망의 음침한 골짜기로 다닐지라도 해를 두려워하지 않을 것은 주께서 나와 함께 하심이라 주의 지팡이와 막대기가 나를 안위하시나이다", eng: "Even though I walk through the darkest valley, I will fear no evil, for you are with me; your rod and your staff, they comfort me.", ref: "भजन संहिता 23:4" },
+            { kor: "너희는 이 세대를 본받지 말고 오직 마음을 새롭게 함으로 변화를 받아 하나님의 선하시고 기뻐하시고 온전하신 뜻이 무엇인지 분별하도록 하라", eng: "Do not conform to the pattern of this world, but be transformed by the renewing of your mind. Then you will be able to test and approve what God’s will is—his good, pleasing and perfect will.", ref: "रोमा 12:2" },
+            { kor: "할 수 있거든이 무슨 말이냐 믿는 자에게는 능치 못할 일이 없느니라 하시니", eng: "'If you can?' said Jesus. 'Everything is possible for one who believes.'", ref: "मरकुस 9:23" },
+            { kor: "믿음은 바라는 것들의 실상이요 보이지 않는 것들의 증거니", eng: "Now faith is confidence in what we hope for and assurance about what we do not see.", ref: "इब्रानियों 11:1" },
+            { kor: "그러므로 염려하여 이르기를 무엇을 먹을까 무엇을 마실까 무엇을 입을까 하지 말라", eng: "Therefore do not worry, saying, 'What shall we eat?' or 'What shall we drink?' or 'What shall we wear?'", ref: "मत्ती 6:31" },
+            { kor: "나의 하나님이 그리스도 예수 안에서 영광 가운데 그 풍성한 대로 너희 모든 쓸 것을 채우시리라", eng: "And my God will meet all your needs according to the riches of his glory in Christ Jesus.", ref: "फिलिप्पियों 4:19" },
+            { kor: "여호와께서 네게 복을 주시고 너를 지키시기를 원하며", eng: "The LORD bless you and keep you;", ref: "गिनती 6:24" },
+            { kor: "하나님은 우리의 피난처시요 힘이시니 환난 중에 만날 큰 도움이시라", eng: "God is our refuge and strength, an ever-present help in trouble.", ref: "भजन संहिता 46:1" },
+            { kor: "그리스도 예수 안에 있는 속량으로 말미암아 하나님의 은혜로 값없이 의롭다 하심을 얻은 자 되었느니라", eng: "and all are justified freely by his grace through the redemption that came by Christ Jesus.", ref: "रोमा 3:24" },
+            { kor: "선을 행하고 선한 사업에 부하고 나눠주기를 좋아하며 동정하는 자가 되게 하라", eng: "Command them to do good, to be rich in good deeds, and to be generous and willing to share.", ref: "१ तीमुथियुस 6:18" },
+            { kor: "너는 마음을 다하여 여호와를 신뢰하고 네 명철을 의지하지 말라", eng: "Trust in the LORD with all your heart and lean not on your own understanding;", ref: "नीतिवचन 3:5" },
+            { kor: "네 길을 여호와께 맡기라 그를 의지하면 그가 이루시고", eng: "Commit your way to the LORD; trust in him and he will do this:", ref: "भजन संहिता 37:5" },
+            { kor: "오직 사랑 안에서 참된 것을 하여 범사에 그에게까지 자랄지라 그는 머리니 곧 그리스도라", eng: "Instead, speaking the truth in love, we will grow to become in every respect the mature body of him who is the head, that is, Christ.", ref: "एफेसी 4:15" },
+            { kor: "모든 것이 주에게서 나오고 주로 말미암고 주에게로 돌아감이라 그에게 영광이 세세에 있을지어다 아멘", eng: "For from him and through him and for him are all things. To him be the glory forever! Amen.", ref: "रोमा 11:36" },
+            { kor: "내가 주께 범죄하지 아니하려 하여 주의 말씀을 내 마음에 두었나이다", eng: "I have hidden your word in my heart that I might not not sin against you.", ref: "भजन संहिता 119:11" },
+            { kor: "주를 기뻐하라 그가 네 마음의 소원을 네게 주시리로다", eng: "Delight yourself in the LORD and he will give you the desires of your heart.", ref: "भजन संहिता 37:4" },
+            { kor: "그러므로 그리스도께서 다시 살아나신 것 같이 우리도 새 생명 가운데서 행하게 하려 함이라", eng: "We were therefore buried with him through baptism into death in order that, just as Christ was raised from the dead through the glory of the Father, we too may live a new life.", ref: "रोमा 6:4" },
+            { kor: "하나님은 우리의 피난처시요 힘이시니 환난 중에 만날 큰 도움이시라", eng: "God is our refuge and strength, an ever-present help in trouble.", ref: "भजन संहिता 46:1" },
+            { kor: "이는 우리가 믿음으로 행하고 보는 것으로 행하지 아니함이로라", eng: "For we live by faith, not by sight.", ref: "२ कुरिन्थियों 5:7" },
+            { kor: "또 너희가 내 이름으로 무엇을 구하든지 내가 행하리니 이는 아버지로 하여금 아들로 말미암아 영광을 받으시게 하려 함이라", eng: "And I will do whatever you ask in my name, so that the Father may be glorified in the Son.", ref: "यूहन्ना 14:13" },
+            { kor: "내가 확신하노니 사망이나 생명이나 천사들이나 권세자들이나 현재 일이나 장래 일이나 능력이나", eng: "For I am persuaded, that neither death, nor life, nor angels, nor principalities, nor powers, nor things present, nor things to come,", ref: "रोमा 8:38" },
+            { kor: "너희 염려를 다 주께 맡기라 이는 그가 너희를 돌보심이라", eng: "Casting all your care upon him; for he careth for you.", ref: "१ पतरस 5:7" },
+            { kor: "주의 인자는 생명보다 나으므로 내 입술이 주를 찬양할 것이라", eng: "Because thy lovingkindness is better than life, my lips shall praise thee.", ref: "भजन संहिता 63:3" },
+            { kor: "그는 실로 우리의 질고를 지고 우리의 슬픔을 당하였거늘 우리는 생각하기를 그는 징벌을 받아 하나님에게 맞으며 고난을 당한다 하였노라", eng: "Surely he hath borne our griefs, and carried our sorrows: yet we did esteem him stricken, smitten of God, and afflicted.", ref: "यशायाह 53:4" },
+            { kor: "너희가 내 안에 거하고 내 말이 너희 안에 거하면 무엇이든지 원하는 대로 구하라 그리하면 이루리라", eng: "If ye abide in me, and my words abide in you, ye shall ask what ye will, and it shall be done unto you.", ref: "यूहन्ना 15:7" },
+            { kor: "여호와는 선하시며 환난 날에 산성이시라 그는 자기에게 피하는 자들을 아시느니라", eng: "The LORD is good, a strong hold in the day of trouble; and he knoweth them that trust in him.", ref: "नाहूम 1:7" },
+            { kor: "네 하나님 여호와를 사랑하고 그 말씀을 청종하며 또 그를 의지하라 그는 네 생명이시요 네 장수시니 여호와께서 네 조상 아브라함과 이삭과 야곱에게 주리라고 맹세하신 땅에 네가 거주하리라", eng: "That thou mayest love the LORD thy God, and and that thou mayest obey his voice, and that thou mayest cleave unto him: for he is thy life, and the length of thy days: that thou mayest dwell in the land which the LORD sware unto thy fathers, to Abraham, to Isaac, and to Jacob, to give them.", ref: "व्यवस्थाविवरण 30:20" }
+        ];
 
-  <script>
-    const platformLink = document.getElementById('platformLink');
-    const infoBox = document.getElementById('infoBox');
+        // App 컴포넌트를 정의합니다.
+        const App = () => {
+            const [showGuide, setShowGuide] = useState(false);
+            const [memos, setMemos] = useState([]);
+            const [newMemoText, setNewMemoText] = useState('');
+            const [randomVerse, setRandomVerse] = useState(null);
+            const [showMemoPopup, setShowMemoPopup] = useState(false);
+            const [currentScreen, setCurrentScreen] = useState('loading'); // 초기 화면을 'loading'으로 설정하여 인증 대기
+            const [loggedInUser, setLoggedInUser] = useState(null); // 사용자가 로그인되어 있는지 추적하는 새로운 상태
 
-    platformLink.addEventListener('click', () => {
-      if (infoBox.style.display === 'none') {
-        infoBox.style.display = 'block';
+            // Firebase 인증 관련 상태
+            const [firebaseAuth, setFirebaseAuth] = useState(null);
+            const [userEmail, setUserEmail] = useState('');
+            const [userId, setUserId] = useState('');
+            const [isAuthReady, setIsAuthReady] = useState(false);
 
-        // 3초 후 가이드 페이지로 자동 이동
-        setTimeout(() => {
-          window.location.href = 'guide.html';
-        }, 3000);
+            // 로그인 폼 상태
+            const [loginEmail, setLoginEmail] = useState('');
+            const [loginPassword, setLoginPassword] = useState('');
+            const [loginMessage, setLoginMessage] = useState('');
 
-      } else {
-        infoBox.style.display = 'none';
-      }
-    });
+            // 회원가입 폼 상태
+            const [signupEmail, setSignupEmail] = useState('');
+            const [signupPassword, setSignupPassword] = useState('');
+            const [confirmPassword, setConfirmPassword] = useState('');
+            const [signupMessage, setSignupMessage] = useState('');
 
-    const verses = [
-      ["내가 너를 고아와 같이 버려두지 아니하고 너희에게로 오리라", "I will not leave you as orphans; I will come to you. (John 14:18)"],
-      ["두려워하지 말라 내가 너와 함께 함이라", "Do not fear, for I am with you. (Isaiah 41:10)"],
-      ["주께서 너를 항상 인도하시리니", "The Lord will guide you always. (Isaiah 58:11)"],
-      ["너희는 세상의 빛이라", "You are the light of the world. (Matthew 5:14)"],
-      ["주님은 변함없으시다", "Jesus Christ is the same yesterday and today and forever. (Hebrews 13:8)"],
-      ["모든 지킬 만한 것 중에 더욱 네 마음을 지키라", "Above all else, guard your heart. (Proverbs 4:23)"],
-      ["내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라", "I can do all this through him who gives me strength. (Philippians 4:13)"],
-      ["여호와를 바랄지어다", "Wait for the Lord. (Psalm 27:14)"]
-    ];
+            // 음성 인식 관련 상태 및 ref
+            const [isListening, setIsListening] = useState(false);
+            const recognitionRef = useRef(null);
 
-    function showRandomVerse() {
-      const verseBox = document.getElementById('verseBox');
-      const randomIndex = Math.floor(Math.random() * verses.length);
-      const [kor, eng] = verses[randomIndex];
-      verseBox.innerHTML = `<b>${kor}</b><br><span>${eng}</span>`;
-    }
+            // Firebase Firestore 인스턴스 (퀵메모 저장을 위해)
+            const [firestoreDb, setFirestoreDb] = useState(null);
 
-    showRandomVerse();
-    setInterval(showRandomVerse, 2000);
+            // 설교 작성 화면 관련 상태
+            const [sermonContent, setSermonContent] = useState(''); // 설교 작성 텍스트 영역 내용
+            const [isGeneratingAI, setIsGeneratingAI] = useState(false); // AI 생성 중 로딩 상태
+            const [selectedSermonType, setSelectedSermonType] = useState(null); // 선택된 설교 유형 (예: '퀵메모 연계 설교', '강해 설교' 등)
+            const [feedbackMessage, setFeedbackMessage] = useState(''); // 피드백 메시지 내용
+            const [showFeedbackModal, setShowFeedbackModal] = useState(false); // 피드백 모달 표시 여부
+            // 비밀번호 재설정 관련 상태
+            const [showResetPasswordModal, setShowResetPasswordModal] = useState(false); // 비밀번호 재설정 모달 표시 여부
+            const [resetEmail, setResetEmail] = useState(''); // 비밀번호 재설정 이메일 입력값
+            const [resetMessage, setResetMessage] = useState(''); // 비밀번호 재설정 메시지
+            // 알림 설정 관련 상태
+            const [showNotificationSettingsModal, setShowNotificationSettingsModal] = useState(false); // 알림 설정 모달 표시 여부
+            const [notificationDays, setNotificationDays] = useState([]); // 선택된 요일 (예: ['화', '목'])
+            const [notificationTime, setNotificationTime] = useState('10:00'); // 선택된 시간 (기본값 오전 10시)
+            const [userPhoneNumber, setUserPhoneNumber] = useState(''); // 알림 받을 전화번호
+            const [notificationSettingMessage, setNotificationSettingMessage] = useState(''); // 알림 설정 저장 메시지
 
-    document.getElementById('quickMemoBtn').addEventListener('click', () => {
-      location.href = 'quickmemo.html';
-    });
+            // 퀵메모 검색 상태
+            const [quickmemoSearchTerm, setQuickmemoSearchTerm] = useState('');
+            const [filteredMemos, setFilteredMemos] = useState([]);
+            const selectedMemoIndex = useRef(null); // 선택된 퀵메모의 인덱스 (DOM 직접 조작 대신 상태로 관리)
 
-    document.getElementById('getStartedBtn').addEventListener('click', () => {
-      location.href = 'auth/login.html'; // 로그인 페이지 경로
-    });
-  </script>
 
-</body>
-</html>
+            // Firebase 초기화 및 인증 상태 리스너 설정
+            useEffect(() => {
+                let app;
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                    console.log('Firebase 앱 초기화 완료.');
+                } else {
+                    app = firebase.app();
+                    console.log('Firebase 앱이 이미 초기화되어 있습니다.');
+                }
+
+                const authInstance = firebase.auth(app);
+                setFirebaseAuth(authInstance);
+                console.log('Firebase Auth 인스턴스 설정 완료.');
+
+                // Firestore 초기화
+                const dbInstance = firebase.firestore(app);
+                setFirestoreDb(dbInstance);
+                console.log('Firebase Firestore 인스턴스 설정 완료.');
+
+                // 초기 Canvas 토큰 인증 시도
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    authInstance.signInWithCustomToken(__initial_auth_token)
+                        .then(() => console.log('Firebase: 커스텀 토큰으로 인증 성공.'))
+                        .catch(error => console.error('Firebase: 커스텀 토큰 인증 중 오류:', error.code, error.message));
+                } else {
+                    console.warn('Firebase: __initial_auth_token이 정의되지 않았거나 비어 있습니다. 일반 사용자 로그인/회원가입 필요.');
+                }
+
+                setIsAuthReady(true); // 인증 초기화 완료
+                console.log('Firebase Auth 초기화 상태: TRUE');
+
+                // Firebase 인증 상태 변경 리스너
+                // 이 리스너가 사용자 로그인/로그아웃 상태를 감지하여 loggedInUser 상태를 업데이트하고
+                // 앱의 초기 화면 전환을 담당합니다.
+                const unsubscribe = authInstance.onAuthStateChanged(user => {
+                    if (user) {
+                        setUserEmail(user.email || '익명 사용자');
+                        setUserId(user.uid);
+                        setLoggedInUser(true); // 사용자 로그인 상태 업데이트
+                        console.log('Firebase: 사용자 상태 변경 - 로그인됨:', user.uid, user.email);
+                        fetchMemos(user.uid); // 로그인 사용자 퀵메모 불러오기
+                        fetchNotificationSettings(user.uid); // 로그인 사용자 알림 설정 불러오기
+
+                        // 앱 시작 시, 또는 로그인 성공 시 바로 말씀 선택 화면으로 이동
+                        // 단, 이미 말씀 선택 화면에 있다면 다시 이동하지 않음 (불필요한 리렌더링 방지)
+                        if (user && currentScreen !== 'sermon-selection') {
+                            setCurrentScreen('sermon-selection');
+                        }
+
+                    } else {
+                        setUserEmail('로그아웃됨');
+                        setUserId('익명');
+                        setLoggedInUser(false); // 사용자 로그아웃 상태 업데이트
+                        console.log('Firebase: 사용자 상태 변경 - 로그아웃됨.');
+                        setCurrentScreen('welcome'); // 로그아웃 상태면 환영 화면으로 강제 이동
+                        setMemos([]); // 로그아웃 시 메모 초기화
+                        setUserPhoneNumber(''); // 로그아웃 시 전화번호 초기화
+                        setNotificationDays([]); // 로그아웃 시 알림 설정 초기화
+                        setNotificationTime('10:00'); // 로그아웃 시 알림 시간 초기화
+                    }
+                });
+
+                return () => unsubscribe();
+            }, [userId]); // userId를 의존성으로 추가하여, userId 변경 시 fetchMemos가 재실행되도록 함. (currentScreen은 제거)
+
+            // 로그인된 사용자의 퀵메모를 Firestore에서 불러오는 함수
+            const fetchMemos = async (currentUserId) => {
+                if (!firestoreDb || !currentUserId || currentUserId === 'anonymous') {
+                    console.warn('Firestore 또는 userId가 유효하지 않아 메모를 불러올 수 없습니다.');
+                    return;
+                }
+                try {
+                    const docRef = firestoreDb.collection(`artifacts/${appId}/users/${currentUserId}/quickmemos`).doc('userMemos');
+                    const docSnap = await docRef.get();
+
+                    if (docSnap.exists) {
+                        const loadedMemos = docSnap.data().memos || [];
+                        setMemos(loadedMemos);
+                        setFilteredMemos(loadedMemos); // 불러온 메모로 필터링된 메모 초기화
+                        console.log('퀵메모 불러오기 성공:', loadedMemos);
+                    } else {
+                        console.log('저장된 퀵메모가 없습니다.');
+                        setMemos([]);
+                        setFilteredMemos([]);
+                    }
+                } catch (error) {
+                    console.error('퀵메모 불러오기 오류:', error);
+                    showCustomMessage(`메모를 불러오는 중 오류가 발생했습니다: ${error.message}`, '오류');
+                }
+            };
+
+            // 퀵메모를 Firestore에 저장하는 함수
+            const saveMemos = async (currentMemos) => {
+                if (!firestoreDb || !userId || userId === 'anonymous') {
+                    showCustomMessage('로그인된 사용자만 메모를 저장할 수 있습니다.', '알림');
+                    return;
+                }
+                try {
+                    const docRef = firestoreDb.collection(`artifacts/${appId}/users/${userId}/quickmemos`).doc('userMemos');
+                    await docRef.set({ memos: currentMemos });
+                    console.log('퀵메모 저장 성공:', currentMemos);
+                } catch (error) {
+                    console.error('퀵메모 저장 오류:', error);
+                    showCustomMessage(`메모 저장 중 오류가 발생했습니다: ${error.message}`, '오류');
+                }
+            };
+
+            // 알림 설정을 Firestore에서 불러오는 함수
+            const fetchNotificationSettings = async (currentUserId) => {
+                if (!firestoreDb || !currentUserId || currentUserId === 'anonymous') {
+                    console.warn('Firestore 또는 userId가 유효하지 않아 알림 설정을 불러올 수 없습니다.');
+                    return;
+                }
+                try {
+                    const docRef = firestoreDb.collection(`artifacts/${appId}/users/${currentUserId}/settings`).doc('notifications');
+                    const docSnap = await docRef.get();
+
+                    if (docSnap.exists) {
+                        const settings = docSnap.data();
+                        setNotificationDays(settings.days || []);
+                        setNotificationTime(settings.time || '10:00');
+                        setUserPhoneNumber(settings.phoneNumber || '');
+                        console.log('알림 설정 불러오기 성공:', settings);
+                    } else {
+                        console.log('저장된 알림 설정이 없습니다. 기본값 사용.');
+                        setNotificationDays([]);
+                        setNotificationTime('10:00');
+                        setUserPhoneNumber('');
+                    }
+                } catch (error) {
+                    console.error('알림 설정 불러오기 오류:', error);
+                    showCustomMessage(`알림 설정을 불러오는 중 오류가 발생했습니다: ${error.message}`, '오류');
+                }
+            };
+
+            // 알림 설정을 Firestore에 저장하는 함수
+            const saveNotificationSettings = async () => {
+                if (!firestoreDb || !userId || userId === 'anonymous') {
+                    showCustomMessage('로그인된 사용자만 알림 설정을 저장할 수 있습니다.', '알림');
+                    return;
+                }
+                if (notificationDays.length > 0 && !userPhoneNumber.trim()) {
+                    setNotificationSettingMessage('알림을 받으려면 전화번호를 입력해주세요.');
+                    return;
+                }
+
+                setIsGeneratingAI(true); // 저장 중 로딩 표시
+                setNotificationSettingMessage('알림 설정 저장 중...');
+
+                try {
+                    const docRef = firestoreDb.collection(`artifacts/${appId}/users/${userId}/settings`).doc('notifications');
+                    const settingsToSave = {
+                        days: notificationDays,
+                        time: notificationTime,
+                        phoneNumber: userPhoneNumber.trim(),
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp() // 서버 타임스탬프 저장
+                    };
+                    await docRef.set(settingsToSave);
+                    console.log('알림 설정 저장 성공:', settingsToSave);
+                    setNotificationSettingMessage('알림 설정이 성공적으로 저장되었습니다.');
+                    setTimeout(() => setShowNotificationSettingsModal(false), 2000); // 2초 후 모달 닫기
+                } catch (error) {
+                    console.error('알림 설정 저장 오류:', error);
+                    setNotificationSettingMessage(`알림 설정 저장 중 오류 발생: ${error.message}`);
+                } finally {
+                    setIsGeneratingAI(false); // 로딩 해제
+                }
+            };
+
+
+            // SpeechRecognition 초기화 및 이벤트 핸들러 설정 (이전과 동일)
+            useEffect(() => {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+                if (SpeechRecognition) {
+                    recognitionRef.current = new SpeechRecognition();
+                    recognitionRef.current.continuous = false;
+                    recognitionRef.current.interimResults = false;
+                    recognitionRef.current.lang = 'ko-KR';
+
+                    recognitionRef.current.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        console.log("음성 인식 결과:", transcript);
+                        setNewMemoText(prevText => prevText + (prevText ? ' ' : '') + transcript);
+                        setIsListening(false);
+                        showCustomMessage(`음성 인식이 완료되었습니다: "${transcript}"`, '음성 인식 완료');
+                    };
+
+                    recognitionRef.current.onerror = (event) => {
+                        console.error("음성 인식 에러:", event.error);
+                        setIsListening(false);
+                        let errorMessage = "음성 인식 중 오류가 발생했습니다.";
+                        if (event.error === 'not-allowed') {
+                            errorMessage = "마이크 사용이 허용되지 않았습니다. 브라우저 설정에서 마이크 접근을 허용해주세요.";
+                        } else if (event.error === 'no-speech') {
+                            errorMessage = "음성이 감지되지 않았습니다. 다시 시도해주세요.";
+                        } else if (event.error === 'audio-capture') {
+                            errorMessage = "오디오 캡처 장치를 찾을 수 없습니다.";
+                        }
+                        showCustomMessage(errorMessage, '음성 인식 오류');
+                    };
+
+                    recognitionRef.current.onend = () => {
+                        console.log("음성 인식이 종료되었습니다.");
+                        setIsListening(false);
+                    };
+                } else {
+                    console.warn("이 브라우저는 Web Speech API를 지원하지 않습니다.");
+                    showCustomMessage("죄송합니다. 이 브라우저는 음성 인식 기능을 지원하지 않습니다. Chrome 브라우저 사용을 권장합니다.", "브라우저 지원");
+                }
+
+                return () => {
+                    if (recognitionRef.current) {
+                        recognitionRef.current.stop();
+                    }
+                };
+            }, []);
+
+            // 무작위 성경 구절 초기 설정 및 3초마다 업데이트
+            useEffect(() => {
+                const randomIndex = Math.floor(Math.random() * bibleVerses.length);
+                setRandomVerse(bibleVerses[randomIndex]);
+
+                const intervalId = setInterval(() => {
+                    const newRandomIndex = Math.floor(Math.floor(Math.random() * bibleVerses.length)); // Math.floor 중복 제거
+                    setRandomVerse(bibleVerses[newRandomIndex]);
+                }, 3000);
+
+                return () => clearInterval(intervalId);
+            }, []);
+
+            const sermonNoteGlow = {
+                textShadow: '0 0 8px rgba(255, 255, 0, 0.8), 0 0 15px rgba(255, 255, 0, 0.6), 0 0 20px rgba(255, 255, 0, 0.4)'
+            };
+
+            // '시작하기' 버튼 클릭 시 로직 변경
+            const handleStartNowClick = () => {
+                console.log("Get Started 버튼 클릭됨.");
+                if (loggedInUser) { // 이미 로그인된 사용자라면
+                    console.log("이미 로그인되어 있으므로 말씀 선택 화면으로 이동합니다.");
+                    setCurrentScreen('sermon-selection');
+                } else { // 로그인되어 있지 않다면
+                    console.log("로그인 화면으로 이동합니다.");
+                    setCurrentScreen('login');
+                    setLoginMessage('');
+                }
+            };
+
+            // 퀵메모 추가 함수 (Firestore 저장 로직 추가)
+            const addMemo = async () => {
+                if (!userId || userId === 'anonymous') {
+                    showCustomMessage('로그인된 사용자만 메모를 저장할 수 있습니다.', '알림');
+                    return;
+                }
+                if (newMemoText.trim() !== '') {
+                    if (memos.length < MAX_MEMOS) {
+                        const updatedMemos = [...memos, newMemoText.trim()];
+                        setMemos(updatedMemos);
+                        setFilteredMemos(updatedMemos); // 필터링된 메모도 업데이트
+                        setNewMemoText('');
+                        await saveMemos(updatedMemos); // Firestore에 저장
+                    } else {
+                        showCustomMessage(`퀵메모는 최대 ${MAX_MEMOS}개까지 저장할 수 있습니다.`, '알림');
+                    }
+                } else {
+                    showCustomMessage('메모 내용을 입력해주세요.', '알림');
+                }
+            };
+
+            // 퀵메모 삭제 함수 (Firestore 저장 로직 추가)
+            const deleteMemo = async (indexToDelete) => {
+                if (!userId || userId === 'anonymous') {
+                    showCustomMessage('로그인된 사용자만 메모를 삭제할 수 있습니다.', '알림');
+                    return;
+                }
+                const updatedMemos = memos.filter((_, index) => index !== indexToDelete);
+                setMemos(updatedMemos);
+                setFilteredMemos(updatedMemos); // 필터링된 메모도 업데이트
+                await saveMemos(updatedMemos); // Firestore에 저장
+            };
+
+            // 퀵메모 검색 입력 이벤트
+            const handleQuickmemoSearch = (e) => {
+                const keyword = e.target.value.trim();
+                setQuickmemoSearchTerm(keyword);
+                if (keyword) {
+                    setFilteredMemos(memos.filter(memo => memo.includes(keyword)));
+                } else {
+                    setFilteredMemos(memos);
+                }
+                selectedMemoIndex.current = null; // 검색 시 선택 해제
+                setSermonContent(''); // 검색 시 설교 내용 초기화
+            };
+
+            // 퀵메모 아이템 클릭 이벤트
+            const handleQuickmemoItemClick = (itemContent, index) => {
+                setSermonContent(itemContent + '\n\n'); // 선택된 메모를 설교 내용에 표시하고 두 줄 띄우기
+                selectedMemoIndex.current = index; // 선택된 인덱스 저장 (UI 업데이트용)
+                showCustomMessage('✅ 퀵메모가 설교문에 추가되었습니다.', '정보');
+            };
+
+
+            const handleVoiceInput = () => {
+                if (!recognitionRef.current) {
+                    showCustomMessage("이 브라우저는 음성 인식 기능을 지원하지 않습니다. Chrome 브라우저 사용을 권장합니다.", "브라우저 지원");
+                    return;
+                }
+
+                if (isListening) {
+                    recognitionRef.current.stop();
+                } else {
+                    setNewMemoText('');
+                    try {
+                        recognitionRef.current.start();
+                        setIsListening(true);
+                        showCustomMessage("말씀하세요... 음성 인식이 시작되었습니다.", "음성 입력");
+                    } catch (error) {
+                        if (error.name === 'InvalidStateError') {
+                            console.warn("SpeechRecognition already started or in an invalid state.");
+                            setIsListening(true);
+                        } else {
+                            console.error("음성 인식 시작 에러:", error);
+                            showCustomMessage("음성 인식 시작에 실패했습니다. 마이크 권한을 확인해주세요.", "오류");
+                            setIsListening(false);
+                        }
+                    }
+                }
+            };
+
+            // Firebase 로그인 처리 함수
+            const handleLogin = async () => {
+                if (!firebaseAuth) {
+                    setLoginMessage('Firebase 인증 서비스가 아직 초기화되지 않았습니다.');
+                    return;
+                }
+                if (!loginEmail || !loginPassword) {
+                    setLoginMessage('이메일과 비밀번호를 모두 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    console.log('로그인 시도 중:', loginEmail);
+                    await firebaseAuth.signInWithEmailAndPassword(loginEmail, loginPassword);
+                    setLoginMessage('로그인 성공! 말씀 선택 화면으로 이동합니다.');
+                    // 로그인 성공 즉시 화면 전환
+                    setCurrentScreen('sermon-selection');
+                } catch (error) {
+                    console.error('Firebase 로그인 오류:', error.code, error.message);
+                    let errorMessage = '로그인 실패: 사용자 이름 또는 비밀번호가 올바르지 않습니다.';
+                    switch (error.code) {
+                        case 'auth/user-not-found':
+                        case 'auth/wrong-password':
+                            errorMessage = '로그인 실패: 이메일 또는 비밀번호가 올바르지 않습니다.';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = '유효하지 않은 이메일 형식입니다.';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = '로그인 시도 횟수가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+                            break;
+                        default:
+                            errorMessage = `로그인 중 오류 발생: ${error.message}`;
+                            break;
+                    }
+                    setLoginMessage(errorMessage);
+                }
+            };
+
+            // Firebase 회원가입 처리 함수
+            const handleSignup = async () => {
+                if (!firebaseAuth) {
+                    setSignupMessage('Firebase 인증 서비스가 아직 초기화되지 않았습니다.');
+                    return;
+                }
+                if (!signupEmail || !signupPassword || !confirmPassword) {
+                    setSignupMessage('모든 필드를 채워주세요.');
+                    return;
+                }
+                if (signupPassword !== confirmPassword) {
+                    setSignupMessage('비밀번호가 일치하지 않습니다.');
+                    return;
+                }
+                if (signupPassword.length < 6) {
+                    setSignupMessage('비밀번호는 6자 이상이어야 합니다.');
+                    return;
+                }
+
+                try {
+                    console.log('회원가입 시도 중:', signupEmail);
+                    await firebaseAuth.createUserWithEmailAndPassword(signupEmail, signupPassword);
+                    setSignupMessage('회원가입 성공! 로그인 화면으로 이동합니다.');
+                    setSignupEmail('');
+                    setSignupPassword('');
+                    setConfirmPassword('');
+                    setTimeout(() => setCurrentScreen('login'), 2000); // 2초 후 로그인 화면으로 이동
+                } catch (error) {
+                    console.error('Firebase 회원가입 오류:', error.code, error.message);
+                    let errorMessage = '회원가입 중 오류가 발생했습니다.';
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage = '이미 사용 중인 이메일 주소입니다.';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = '유효하지 않은 이메일 형식입니다.';
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage = '비밀번호는 6자 이상이어야 합니다.';
+                            break;
+                        default:
+                            errorMessage = `회원가입 중 오류 발생: ${error.message}`;
+                            break;
+                    }
+                    setSignupMessage(errorMessage);
+                }
+            };
+
+            // Firebase 비밀번호 재설정 함수
+            const handlePasswordReset = async () => {
+                if (!firebaseAuth) {
+                    setResetMessage('Firebase 인증 서비스가 아직 초기화되지 않았습니다.');
+                    return;
+                }
+                if (!resetEmail.trim()) {
+                    setResetMessage('이메일 주소를 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    await firebaseAuth.sendPasswordResetEmail(resetEmail.trim());
+                    setResetMessage('비밀번호 재설정 이메일이 전송되었습니다. 이메일을 확인해주세요.');
+                    setResetEmail('');
+                    setTimeout(() => setShowResetPasswordModal(false), 3000); // 3초 후 모달 닫기
+                } catch (error) {
+                    console.error('비밀번호 재설정 오류:', error.code, error.message);
+                    let errorMessage = '비밀번호 재설정 이메일 전송에 실패했습니다.';
+                    switch (error.code) {
+                        case 'auth/user-not-found':
+                            errorMessage = '등록되지 않은 이메일 주소입니다.';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = '유효하지 않은 이메일 형식입니다.';
+                            break;
+                        default:
+                            errorMessage = `오류 발생: ${error.message}`;
+                            break;
+                    }
+                    setResetMessage(errorMessage);
+                }
+            };
+
+
+            // 커스텀 메시지 모달을 표시하는 함수 (React 외부에서 DOM 조작)
+            // longContent가 true이면 스크롤 가능한 모달을 표시합니다.
+            const showCustomMessage = (message, title = "알림", longContent = false) => {
+                const customModal = document.createElement('div');
+                customModal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+                customModal.innerHTML = `
+                    <div class="bg-white text-gray-800 p-8 rounded-lg shadow-2xl max-w-sm w-full relative text-center flex flex-col">
+                        <h3 class="text-2xl font-bold mb-4 text-blue-700">${title}</h3>
+                        <p class="text-lg mb-6 ${longContent ? 'max-h-64 overflow-y-auto custom-scrollbar p-2 rounded-md bg-gray-100' : ''}">${message}</p>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md" onclick="this.closest('.fixed').remove()">확인</button>
+                    </div>
+                `;
+                document.body.appendChild(customModal);
+            };
+
+            // API 호출 함수 예시 (배포된 Cloud Function 사용)
+            const BASE_API_URL = 'https://api-zvqnbldvva-uc.a.run.app'; // 사용자님의 Cloud Function URL
+
+            const callBibleApi = async () => {
+                try {
+                    showCustomMessage('성경 구절 및 AI 통찰을 불러오는 중...', '처리 중');
+                    // 성경 구절 불러오기
+                    const bibleResponse = await fetch(`${BASE_API_URL}/api/bible-verse?reference=요한복음 3:16`);
+                    const bibleData = await bibleResponse.json();
+                    let bibleText = '';
+                    if (bibleResponse.ok) {
+                        bibleText = bibleData.text;
+                        console.log('성경 구절:', bibleText);
+                        showCustomMessage(`요한복음 3:16 구절: "${bibleText}"`, '성경 구절');
+                    } else {
+                        console.error('성경 구절 불러오기 실패:', bibleData.error);
+                        showCustomMessage(`성경 구절 불러오기 실패: ${bibleData.error}`, '오류');
+                        return; // 오류 발생 시 AI 호출 건너뛰기
+                    }
+
+                    // AI 처리 API 호출 예시
+                    const aiPrompt = `다음 성경 구절을 현대적인 언어로 쉽게 설명하고, 목회자를 위한 묵상 포인트를 2가지 알려줘: "${bibleText}"`;
+                    const aiSystemPrompt = "당신은 성경 말씀을 깊이 있게 설명하는 친절한 AI 비서입니다. 목회자에게 실제적인 도움을 주는 통찰을 제공합니다.";
+
+                    const aiResponse = await fetch(`${BASE_API_URL}/api/ai-process`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: aiPrompt,
+                            systemPrompt: aiSystemPrompt
+                        })
+                    });
+                    const aiData = await aiResponse.json();
+                    if (aiResponse.ok) {
+                        console.log('AI 통찰:', aiData.content);
+                        showCustomMessage(`AI 통찰:\n${aiData.content}`, 'AI 통찰', true); // 스크롤 가능하도록 설정
+                    } else {
+                        console.error('AI 통찰 불러오기 실패:', aiData.error || aiData.details);
+                        showCustomMessage(`AI 통찰 불러오기 실패: ${aiData.error || aiData.details}`, '오류');
+                    }
+
+                } catch (error) {
+                    console.error('API 호출 중 네트워크 오류:', error);
+                    showCustomMessage(`API 호출 중 네트워크 오류 발생: ${error.message}`, '오류');
+                }
+            };
+
+            // AI 설교 초안 생성 함수
+            const generateSermonDraft = async () => {
+                if (!sermonContent.trim()) {
+                    showCustomMessage('설교 초안 생성을 위해 내용을 입력해주세요.', '알림');
+                    return;
+                }
+                if (!userId || userId === 'anonymous') {
+                    showCustomMessage('로그인된 사용자만 AI 설교 초안을 생성할 수 있습니다.', '알림');
+                    return;
+                }
+
+                setIsGeneratingAI(true); // AI 생성 시작, 로딩 상태 활성화
+                showCustomMessage('AI가 설교 초안을 생성 중입니다. 잠시만 기다려 주세요...', 'AI 생성 중');
+
+                let prompt = sermonContent;
+                let systemPrompt = "당신은 목회자를 돕는 설교 작성 AI입니다. 제공된 내용을 바탕으로 설교 초안을 작성해주세요.";
+                let model = 'gpt-4o-mini'; // 기본 모델
+
+                // 선택된 설교 유형에 따라 프롬프트 조정
+                switch (selectedSermonType) {
+                    case '퀵메모 연계 설교':
+                        prompt = `다음 퀵메모 내용을 바탕으로 설교 초안을 작성해 주세요. 핵심 메시지가 잘 드러나도록 간결하게 구성해주세요. 퀵메모: "${sermonContent}"`;
+                        systemPrompt = "당신은 퀵메모를 바탕으로 간결하고 핵심적인 설교 초안을 작성하는 AI입니다.";
+                        break;
+                    case '강해 설교':
+                        prompt = `다음 성경 본문(${sermonContent})에 대한 강해 설교 초안을 작성해 주세요. 본문의 문맥과 의미를 깊이 있게 다루고, 적용점을 포함해 주세요.`;
+                        systemPrompt = "당신은 성경 본문을 깊이 있게 강해하는 설교 작성 AI입니다.";
+                        break;
+                    case '예화 중심 설교':
+                        prompt = `다음 주제(${sermonContent})에 맞는 감동적인 예화를 포함한 설교 초안을 작성해 주세요. 예화가 설교의 메시지를 효과적으로 전달하도록 해주세요.`;
+                        systemPrompt = "당신은 주제에 맞는 예화를 효과적으로 활용하여 설교를 작성하는 AI입니다.";
+                        break;
+                    case '자유 형식 설교':
+                        prompt = `다음 요청(${sermonContent})에 따라 자유 형식의 설교 초안을 작성해 주세요.`;
+                        systemPrompt = "당신은 사용자의 요청에 따라 다양한 형식의 설교를 자유롭게 작성하는 AI입니다.";
+                        break;
+                    default:
+                        // 기본값 유지
+                        break;
+                }
+
+                try {
+                    const response = await fetch(`${BASE_API_URL}/api/ai-process`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: prompt, systemPrompt: systemPrompt, model: model })
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        setSermonContent(data.content); // AI가 생성한 내용을 텍스트 영역에 채움
+                        showCustomMessage('AI 설교 초안 생성이 완료되었습니다.', '생성 완료');
+                    } else {
+                        console.error('AI 설교 초안 생성 실패:', data.error || data.details);
+                        showCustomMessage(`AI 설교 초안 생성 실패: ${data.error || data.details}`, '오류');
+                    }
+                } catch (error) {
+                    console.error('AI 설교 초안 API 호출 중 네트워크 오류:', error);
+                    showCustomMessage(`AI 설교 초안 생성 중 네트워크 오류 발생: ${error.message}`, '오류');
+                } finally {
+                    setIsGeneratingAI(false); // AI 생성 완료 또는 오류 발생 시 로딩 상태 비활성화
+                }
+            };
+
+
+            return (
+                <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 font-inter relative overflow-hidden">
+
+                    {/* 앱 로딩 중 화면 */}
+                    {currentScreen === 'loading' && (
+                        <div className="text-center">
+                            <svg className="animate-spin h-10 w-10 text-yellow-300 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p className="text-lg text-yellow-300">Firebase 인증 확인 중...</p>
+                        </div>
+                    )}
+
+                    {/* Welcome Screen (초기 화면) */}
+                    {currentScreen === 'welcome' && (
+                        <div className="w-full max-w-6xl bg-gray-800 rounded-lg shadow-xl relative flex flex-col items-center justify-between p-8 md:p-12">
+                            <h1
+                                className="text-6xl md:text-8xl font-extrabold text-yellow-300 z-10 mb-12 mt-auto"
+                                style={sermonNoteGlow}
+                            >
+                                SermonNote
+                            </h1>
+
+                            {randomVerse && (
+                                <div className="bg-white text-gray-800 p-8 rounded-lg shadow-xl max-w-xl w-full text-center mb-12 z-10">
+                                    <p className="text-xl md:text-2xl font-semibold mb-4 leading-relaxed">
+                                        {randomVerse.kor}
+                                    </p>
+                                    <p className="text-lg md:text-xl text-gray-600 mb-6">
+                                        ({randomVerse.ref})
+                                    </p>
+                                    <div className="border-t border-gray-200 pt-4">
+                                        <p className="text-lg md:text-xl font-medium leading-relaxed">
+                                            {randomVerse.eng}
+                                        </p>
+                                        <p className="text-base md:text-lg text-gray-500 mt-2">
+                                            ({randomVerse.ref})
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <button
+                                onClick={handleStartNowClick}
+                                className="
+                                    bg-amber-400 hover:bg-amber-500
+                                    text-gray-900 font-bold
+                                    py-4 px-12
+                                    rounded-full
+                                    text-xl
+                                    shadow-lg
+                                    transform transition-transform duration-300 hover:scale-105
+                                    z-10 mb-auto"
+                            >
+                                시작하기
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Login Screen (로그인 화면) */}
+                    {currentScreen === 'login' && (
+                        <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-xl p-8 md:p-10 flex flex-col items-center justify-center min-h-[60vh] relative">
+                            <h2 className="text-4xl font-bold mb-8 text-yellow-300">로그인</h2>
+                            <div className="w-full mb-4">
+                                <label htmlFor="loginEmail" className="block text-gray-300 text-sm font-bold mb-2">
+                                    이메일 주소
+                                </label>
+                                <input
+                                    type="email"
+                                    id="loginEmail"
+                                    className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 border-gray-600 placeholder-gray-400"
+                                    placeholder="이메일 주소"
+                                    value={loginEmail}
+                                    onChange={(e) => setLoginEmail(e.target.value)}
+                                />
+                            </div>
+                            <div className="w-full mb-6">
+                                <label htmlFor="loginPassword" className="block text-gray-300 text-sm font-bold mb-2">
+                                    비밀번호
+                                </label>
+                                <input
+                                    type="password"
+                                    id="loginPassword"
+                                    className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 border-gray-600 placeholder-gray-400"
+                                    placeholder="비밀번호"
+                                    value={loginPassword}
+                                    onChange={(e) => setLoginPassword(e.target.value)}
+                                />
+                            </div>
+                            {loginMessage && (
+                                <p className={`text-center mb-4 ${loginMessage.includes('성공') ? 'text-green-400' : 'text-red-400'}`}>
+                                    {loginMessage}
+                                </p>
+                            )}
+                            <button
+                                onClick={handleLogin}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105 mb-4 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!isAuthReady} // Firebase Auth 초기화 전까지 비활성화
+                            >
+                                로그인
+                            </button>
+                            <button
+                                onClick={() => setCurrentScreen('signup')}
+                                className="text-gray-400 hover:text-gray-200 transition-colors duration-200 mb-2"
+                            >
+                                회원가입
+                            </button>
+                            <button
+                                onClick={() => setShowResetPasswordModal(true)} // 비밀번호 재설정 모달 열기
+                                className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
+                            >
+                                비밀번호 재설정
+                            </button>
+                            <button
+                                onClick={() => setCurrentScreen('welcome')}
+                                className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
+                            >
+                                환영 화면으로 돌아가기
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Signup Screen (회원가입 화면) */}
+                    {currentScreen === 'signup' && (
+                        <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-xl p-8 md:p-10 flex flex-col items-center justify-center min-h-[60vh] relative">
+                            <h2 className="text-4xl font-bold mb-8 text-yellow-300">회원가입</h2>
+                            <div className="w-full mb-4">
+                                <label htmlFor="signupEmail" className="block text-gray-300 text-sm font-bold mb-2">
+                                    이메일 주소
+                                </label>
+                                <input
+                                    type="email"
+                                    id="signupEmail"
+                                    className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 border-gray-600 placeholder-gray-400"
+                                    placeholder="이메일 주소"
+                                    value={signupEmail}
+                                    onChange={(e) => setSignupEmail(e.target.value)}
+                                />
+                            </div>
+                            <div className="w-full mb-4">
+                                <label htmlFor="signupPassword" className="block text-gray-300 text-sm font-bold mb-2">
+                                    비밀번호 (6자 이상)
+                                </label>
+                                <input
+                                    type="password"
+                                    id="signupPassword"
+                                    className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 border-gray-600 placeholder-gray-400"
+                                    placeholder="비밀번호"
+                                    value={signupPassword}
+                                    onChange={(e) => setSignupPassword(e.target.value)}
+                                />
+                            </div>
+                            <div className="w-full mb-6">
+                                <label htmlFor="confirmPassword" className="block text-gray-300 text-sm font-bold mb-2">
+                                    비밀번호 확인
+                                </label>
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    className="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 border-gray-600 placeholder-gray-400"
+                                    placeholder="비밀번호 확인"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                            </div>
+                            {signupMessage && (
+                                <p className={`text-center mb-4 ${signupMessage.includes('성공') ? 'text-green-400' : 'text-red-400'}`}>
+                                    {signupMessage}
+                                </p>
+                            )}
+                            <button
+                                onClick={handleSignup}
+                                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105 mb-4 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!isAuthReady} // Firebase Auth 초기화 전까지 비활성화
+                            >
+                                회원가입
+                            </button>
+                            <button
+                                onClick={() => setCurrentScreen('login')}
+                                className="text-gray-400 hover:text-gray-200 transition-colors duration-200 mb-2"
+                            >
+                                로그인 화면으로 돌아가기
+                            </button>
+                        </div>
+                    )}
+
+                    {/* 말씀 선택 화면 (로그인 성공 시 나타날 화면) */}
+                    {currentScreen === 'sermon-selection' && (
+                        <div className="sermon-selection-container"> {/* 기존 스타일 적용을 위해 클래스 추가 */}
+                            <h2>어떤 설교를 준비하시겠습니까?</h2>
+                            <div className="sermon-options-grid"> {/* 기존 스타일 적용을 위해 클래스 추가 */}
+                                <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('sermon-creation'); setSelectedSermonType('퀵메모 연계 설교'); setSermonContent(memos.join('\n')); }} className="sermon-option-card">
+                                    <span className="icon">📝</span>
+                                    <h3>퀵메모 연계 설교</h3>
+                                    <p>간단한 아이디어로 설교 초안을 빠르게 생성합니다.</p>
+                                </a>
+                                <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('sermon-creation'); setSelectedSermonType('강해 설교'); setSermonContent(''); }} className="sermon-option-card">
+                                    <span className="icon">📖</span>
+                                    <h3>강해 설교</h3>
+                                    <p>성경 본문 중심의 깊이 있는 설교를 작성합니다.</p>
+                                </a>
+                                <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('sermon-creation'); setSelectedSermonType('예화 중심 설교'); setSermonContent(''); }} className="sermon-option-card">
+                                    <span className="icon">✨</span>
+                                    <h3>예화 중심 설교</h3>
+                                    <p>다양한 예화를 활용하여 설교를 풍성하게 합니다.</p>
+                                </a>
+                                <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('sermon-creation'); setSelectedSermonType('자유 형식 설교'); setSermonContent(''); }} className="sermon-option-card">
+                                    <span className="icon">💡</span>
+                                    <h3>자유 형식 설교</h3>
+                                    <p>주제와 요청에 따라 자유롭게 설교를 구성합니다.</p>
+                                </a>
+                            </div>
+
+                            {/* 로그인된 사용자 정보 및 로그아웃 버튼 */}
+                            <div className="mt-10 pt-5 border-t border-gray-300">
+                                {userId && (
+                                    <p className="text-gray-700 text-sm mb-4">
+                                        로그인된 사용자: {userEmail} (UID: {userId})
+                                    </p>
+                                )}
+                                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md" onClick={() => {
+                                    firebaseAuth.signOut().then(() => {
+                                        showCustomMessage('로그아웃 되었습니다.', '로그아웃');
+                                        // 로그아웃 후 onAuthStateChanged 리스너가 currentScreen을 'welcome'으로 변경할 것입니다.
+                                    }).catch((error) => {
+                                        console.error('Logout Error:', error);
+                                        showCustomMessage(`로그아웃 중 오류 발생: ${error.message}`, '오류');
+                                    });
+                                }}>
+                                    로그아웃
+                                </button>
+                                {/* API 테스트 버튼 (기능 안내) */}
+                                <button className="mt-4 bg-amber-500 hover:bg-amber-600 text-white py-2 px-4 rounded-md ml-4" onClick={callBibleApi}>
+                                    API로 성경 구절 불러오기 및 AI 통찰 (테스트)
+                                </button>
+                                {/* 피드백 보내기 버튼 추가 */}
+                                <button
+                                    onClick={() => setShowFeedbackModal(true)}
+                                    className="mt-4 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md ml-4"
+                                >
+                                    피드백 보내기
+                                </button>
+                                {/* 알림 설정 버튼 추가 */}
+                                <button
+                                    onClick={() => setShowNotificationSettingsModal(true)}
+                                    className="mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-md ml-4"
+                                >
+                                    알림 설정
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 설교 작성 화면 (새로운 템플릿 적용) */}
+                    {currentScreen === 'sermon-creation' && (
+                        <div className="sermon-creation-container-new">
+                            <h2>✍ {selectedSermonType} 작성</h2>
+
+                            <div className="sermon-panels-container">
+                                {/* Left: Quick Memo & Message */}
+                                <div className="sermon-left-panel">
+                                    <input
+                                        type="text"
+                                        className="quickmemo-search-input"
+                                        placeholder="🔍 퀵메모 검색..."
+                                        value={quickmemoSearchTerm}
+                                        onChange={handleQuickmemoSearch}
+                                    />
+                                    <div className="quickmemo-list-area">
+                                        {filteredMemos.length === 0 ? (
+                                            <div style={{padding:'10px', textAlign:'center', color:'#555'}}>
+                                                {quickmemoSearchTerm ? '검색 결과가 없습니다.' : '표시할 퀵메모가 없습니다.'}
+                                            </div>
+                                        ) : (
+                                            filteredMemos.map((item, idx) => (
+                                                <div
+                                                    key={idx} // React에서는 key가 필요
+                                                    className={`quickmemo-item ${selectedMemoIndex.current === idx ? 'selected' : ''}`}
+                                                    onClick={() => handleQuickmemoItemClick(item, idx)}
+                                                >
+                                                    {item}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                    <div className="message-box" id="quickmemoMessage">
+                                        {/* 메시지 표시 영역 */}
+                                        메모를 선택하면 설교 작성을 시작합니다.
+                                    </div>
+                                </div>
+
+                                {/* Right: Sermon Editor */}
+                                <div className="sermon-right-panel">
+                                    <textarea
+                                        className="sermon-content-textarea"
+                                        placeholder={
+                                            selectedSermonType === '퀵메모 연계 설교' ? '선택된 퀵메모를 바탕으로 설교문이 작성됩니다...' :
+                                            selectedSermonType === '강해 설교' ? '성경 본문을 입력하고 강해 설교 초안을 생성합니다...' :
+                                            selectedSermonType === '예화 중심 설교' ? '예화 주제를 입력하고 예화 중심 설교 초안을 생성합니다...' :
+                                            selectedSermonType === '자유 형식 설교' ? '원하는 설교 주제나 내용을 자유롭게 입력하세요...' :
+                                            '설교 내용을 작성하거나 AI 도움을 요청하세요...'
+                                        }
+                                        value={sermonContent}
+                                        onChange={(e) => setSermonContent(e.target.value)}
+                                    ></textarea>
+
+                                    <div className="sermon-btn-row">
+                                        <button className="sermon-btn" onClick={generateSermonDraft} disabled={isGeneratingAI}>
+                                            🧠 {isGeneratingAI ? 'AI 설교 생성 중...' : 'AI 설교 자동 작성'}
+                                        </button>
+                                        <button className="sermon-btn" onClick={async () => {
+                                            const sermonText = sermonContent.trim();
+                                            if (!sermonText) {
+                                                showCustomMessage('❗ 주석을 달 설교문이 비어 있습니다.', '경고');
+                                                return;
+                                            }
+                                            setIsGeneratingAI(true);
+                                            showCustomMessage('AI가 주석을 작성 중입니다. 잠시만 기다려주세요...', 'AI 생성 중');
+                                            const result = await callAI(
+                                                `${sermonText} 이 설교문에 문단별로 성경적, 신학적 배경을 포함한 주석을 달아줘. 주석은 본문 아래에 [주석:] 형태로 추가해줘.`,
+                                                "당신은 신학적으로 깊이 있는 성경 주석가입니다. 설교문의 의미를 풍부하게 하는 주석을 작성합니다."
+                                            );
+                                            if (result) {
+                                                setSermonContent(result);
+                                                showCustomMessage('✅ 주석 작성이 완료되었습니다!', '정보');
+                                            }
+                                            setIsGeneratingAI(false);
+                                        }} disabled={isGeneratingAI}>
+                                            📌 주석 달기
+                                        </button>
+                                        <button className="sermon-btn" onClick={() => {
+                                            const { jsPDF } = window.jspdf;
+                                            const doc = new jsPDF();
+                                            const content = sermonContent.trim();
+
+                                            if (!content) {
+                                                showCustomMessage('❗ 저장할 설교문 내용이 없습니다.', '경고');
+                                                return;
+                                            }
+
+                                            // 한글 지원을 위해서는 jspdf-autotable과 커스텀 폰트 로딩 필요
+                                            // 여기서는 기본 폰트 사용 (한글 깨질 수 있음)
+                                            const lines = doc.splitTextToSize(content, 180);
+                                            let y = 10;
+                                            const lineHeight = 7;
+
+                                            lines.forEach(line => {
+                                                if (y > 280) {
+                                                    doc.addPage();
+                                                    y = 10;
+                                                }
+                                                doc.text(line, 10, y);
+                                                y += lineHeight;
+                                            });
+
+                                            doc.save(`${selectedSermonType || '설교문'}_${new Date().toISOString().slice(0,10)}.pdf`);
+                                            showCustomMessage('✅ 설교문이 PDF로 저장되었습니다.', '정보');
+                                        }}>
+                                            📄 PDF 저장
+                                        </button>
+                                        <button className="sermon-btn" onClick={() => window.print()}>
+                                            🖨️ 인쇄
+                                        </button>
+                                        <button className="sermon-btn" onClick={() => {
+                                            showCustomMessage('정말로 설교문 내용을 초기화하시겠습니까?', '확인', false, () => { // 콜백 함수 추가
+                                                setSermonContent('');
+                                                selectedMemoIndex.current = null;
+                                                setQuickmemoSearchTerm('');
+                                                setFilteredMemos(memos); // 전체 메모로 복원
+                                                showCustomMessage('설교문 내용이 초기화되었습니다.', '정보');
+                                            });
+                                        }}>
+                                            🧼 내용 초기화
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* 말씀 선택 화면으로 돌아가기 버튼 */}
+                            <button
+                                onClick={() => setCurrentScreen('sermon-selection')}
+                                className="text-gray-400 hover:text-gray-200 transition-colors duration-200 mt-8"
+                            >
+                                말씀 선택 화면으로 돌아가기
+                            </button>
+                        </div>
+                    )}
+
+                    {/* 사이트 가이드 모달 */}
+                    {showGuide && (
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                            <div class="bg-white text-gray-800 p-8 rounded-lg shadow-2xl max-w-2xl w-full relative">
+                                <h2 class="text-3xl font-bold mb-4 text-blue-700">말씀노트: 우리 사이트 안내</h2>
+                                <p class="text-lg mb-4 leading-relaxed">
+                                    환영합니다! '말씀노트'는 목회자분들의 설교 준비를 돕기 위해
+                                    AI 기술을 활용한 혁신적인 플랫폼입니다.
+                                </p>
+                                <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+                                    <li>성경 구절 검색 및 분석 도구 제공</li>
+                                    <li>퀵메모 기능을 통한 설교 아이디어 즉시 기록</li>
+                                    <li>AI 기반 설교 초안 및 원어 통찰 생성</li>
+                                    <li>다양한 설교 작성 양식 지원</li>
+                                    <li>개인화된 설교 자료 관리 및 보관</li>
+                                    <li>**소속 교단 정보는 맞춤화된 고도의 설교 작성 기능을 돕기 위해 활용될 수 있습니다.**</li>
+                                </ul>
+                                <p class="text-lg mb-6 leading-relaxed">
+                                    로그인 후 모든 기능을 자유롭게 사용하며,
+                                    하나님의 말씀을 더 깊이 연구하고 효과적으로 전달하는 데 도움을 받으세요.
+                                </p>
+                                <button
+                                    onClick={() => setShowGuide(false)}
+                                    class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 피드백 모달 */}
+                    {showFeedbackModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                            <div className="bg-gray-800 text-white p-8 rounded-lg shadow-2xl max-w-md w-full relative">
+                                <h2 className="text-2xl font-bold mb-4 text-yellow-300">피드백 보내기</h2>
+                                <textarea
+                                    className="w-full p-3 rounded-md bg-gray-700 text-white placeholder-gray-400 border border-gray-600 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="개선점, 오류 보고, 새로운 기능 제안 등 자유롭게 의견을 남겨주세요."
+                                    rows="6"
+                                    value={feedbackMessage}
+                                    onChange={(e) => setFeedbackMessage(e.target.value)}
+                                ></textarea>
+                                <div className="flex justify-end space-x-4">
+                                    <button
+                                        onClick={() => { setFeedbackMessage(''); setShowFeedbackModal(false); }}
+                                        className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
+                                    >
+                                        취소
+                                    </button>
+                                    <button
+                                        onClick={sendFeedback}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={!feedbackMessage.trim()} // 메시지가 비어있으면 비활성화
+                                    >
+                                        보내기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 비밀번호 재설정 모달 */}
+                    {showResetPasswordModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                            <div className="bg-gray-800 text-white p-8 rounded-lg shadow-2xl max-w-md w-full relative">
+                                <h2 className="text-2xl font-bold mb-4 text-yellow-300">비밀번호 재설정</h2>
+                                <p className="text-gray-300 mb-4">계정에 등록된 이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다.</p>
+                                <input
+                                    type="email"
+                                    className="w-full p-3 rounded-md bg-gray-700 text-white placeholder-gray-400 border border-gray-600 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="이메일 주소"
+                                    value={resetEmail}
+                                    onChange={(e) => setResetEmail(e.target.value)}
+                                />
+                                {resetMessage && (
+                                    <p className={`text-center mb-4 ${resetMessage.includes('성공') || resetMessage.includes('전송되었습니다') ? 'text-green-400' : 'text-red-400'}`}>
+                                        {resetMessage}
+                                    </p>
+                                )}
+                                <div className="flex justify-end space-x-4">
+                                    <button
+                                        onClick={() => { setResetEmail(''); setResetMessage(''); setShowResetPasswordModal(false); }}
+                                        className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
+                                    >
+                                        취소
+                                    </button>
+                                    <button
+                                        onClick={handlePasswordReset}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={!resetEmail.trim()} // 이메일이 비어있으면 비활성화
+                                    >
+                                        재설정 이메일 보내기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 알림 설정 모달 */}
+                    {showNotificationSettingsModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                            <div className="bg-gray-800 text-white p-8 rounded-lg shadow-2xl max-w-md w-full relative">
+                                <h2 className="text-2xl font-bold mb-4 text-yellow-300">설교 준비 알림 설정</h2>
+                                <p className="text-gray-300 mb-4">원하는 요일과 시간대를 선택하고 전화번호를 입력하시면, AI가 양질의 설교 준비를 돕기 위한 알림을 보내드립니다.</p>
+
+                                {/* 요일 선택 */}
+                                <div className="mb-4">
+                                    <label className="block text-gray-300 text-sm font-bold mb-2">알림 요일:</label>
+                                    <div className="flex flex-wrap gap-2 justify-center">
+                                        {['월', '화', '수', '목', '금', '토', '일'].map(day => (
+                                            <button
+                                                key={day}
+                                                onClick={() => {
+                                                    setNotificationDays(prev =>
+                                                        prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+                                                    );
+                                                }}
+                                                className={`py-2 px-4 rounded-full text-sm font-semibold transition-colors duration-200 ${
+                                                    notificationDays.includes(day) ? 'bg-blue-6
