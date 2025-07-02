@@ -19,12 +19,4 @@
       "**/.*",
       "**/node_modules/**"
     ]
-    // "rewrites" 섹션을 완전히 제거합니다.
-    // "rewrites": [
-    //   {
-    //     "source": "**",
-    //     "destination": "/index.html"
-    //   }
-    // ]
-  }
-}
+  
