@@ -2,16 +2,16 @@ const functions = require("firebase-functions/v2");
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
-const OpenAI = require("openai");
+const OpenAI = require("openai"); // OpenAI 라이브러리 임포트
 
-admin.initializeApp();
+admin.initializeApp(); // Firebase Admin SDK 초기화
 
 const app = express();
-app.use(cors({ origin: true }));
-app.use(express.json());
+app.use(cors({ origin: true })); // CORS 활성화
+app.use(express.json()); // JSON 요청 본문 파싱
 
 const openai = new OpenAI({
-  apiKey: functions.config().openai.key,
+  apiKey: process.env.OPENAI_API_KEY, // 이렇게 변경합니다!
 });
 
 // ✅ OPTIONS 프리플라이트 요청 처리
@@ -28,21 +28,24 @@ app.post("/", async (req, res) => {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o", // 사용할 OpenAI 모델 (예: gpt-4o, gpt-3.5-turbo 등)
       messages: [
         { role: "system", content: "너는 친절한 설교 작성 도우미야." },
         { role: "user", content: prompt },
       ],
-      max_tokens: 800,
-      temperature: 0.7,
+      max_tokens: 800, // 최대 토큰 수
+      temperature: 0.7, // 창의성 조절 (0.0-1.0)
     });
 
     const result = completion.choices[0].message.content.trim();
-    res.json({ result });
+    res.json({ result }); // 결과 반환
   } catch (error) {
-    console.error(error);
-    res.status(500).send("AI 생성 실패");
+    console.error(error); // 에러 로깅
+    res.status(500).send("AI 생성 실패"); // 에러 응답
   }
 });
 
-exports.generateExamples = functions.https.onRequest(app);
+// HTTP 요청을 처리하는 Cloud Function으로 Express 앱 내보내기
+exports.generateExamples = functions.https.onRequest({
+  secrets: ["OPENAI_API_KEY"] // <-- 이 부분이 정확히 있어야 합니다!
+}, app);
