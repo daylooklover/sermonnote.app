@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>설교 작성 - 퀵메모 + AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Nanum Gothic', sans-serif;
+      background: linear-gradient(135deg, #1c1c2b, #28313b);
+      color: #eee;
+      display: flex;
+      height: 100vh;
+    }
+
+    .left-panel {
+      width: 300px;
+      background: #222;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .left-panel h2 {
+      font-size: 18px;
+      color: #ffe082;
+      margin-bottom: 10px;
+    }
+
+    .memo-item {
+      background: #333;
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .memo-item:hover {
+      background: #444;
+    }
+
+    .right-panel {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .right-panel h1 {
+      font-size: 22px;
+      margin-bottom: 16px;
+      color: #fff176;
+    }
+
+    textarea {
+      flex: 1;
+      padding: 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      background: #111;
+      color: #eee;
+      border: none;
+      resize: none;
+      box-shadow: inset 0 0 10px #555;
+    }
+
+    .button-bar {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: #ffeb3b;
+      color: #000;
+    }
+
+    button:hover {
+      background-color: #fff176;
+    }
+
+    #resultBox {
+      margin-top: 20px;
+      padding: 15px;
+      background: #222;
+      border-radius: 10px;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="left-panel">
+    <h2>📝 퀵메모</h2>
+    <div id="memoList"></div>
+  </div>
+
+  <div class="right-panel">
+    <h1>📖 설교문 작성</h1>
+    <textarea id="sermonText" placeholder="설교문을 작성하거나 퀵메모를 삽입할 수 있습니다."></textarea>
+
+    <div class="button-bar">
+      <button onclick="saveSermon()">저장</button>
+      <button onclick="clearText()">초기화</button>
+      <button onclick="printSermon()">인쇄</button>
+      <button onclick="generateOutline()">✍ 설교 개요 생성</button>
+      <button onclick="recommendBible()">📖 성경구절 추천</button>
+      <button onclick="startVoice()">🎤 음성으로 주제 말하기</button>
+    </div>
+
+    <div id="resultBox">💡 AI 결과가 여기에 표시됩니다...</div>
+  </div>
+
+  <script>
+    const memoListEl = document.getElementById("memoList");
+    const sermonText = document.getElementById("sermonText");
+
+    const quickmemos = JSON.parse(localStorage.getItem("quickmemos")) || [
+      "하나님의 은혜는 무한합니다.",
+      "믿음은 시련을 견디게 합니다.",
+      "사랑은 모든 것을 이깁니다."
+    ];
+
+    function renderMemos() {
+      memoListEl.innerHTML = "";
+      quickmemos.forEach((memo) => {
+        const div = document.createElement("div");
+        div.className = "memo-item";
+        div.textContent = memo;
+        div.onclick = () => {
+          sermonText.value += (sermonText.value ? "\n" : "") + memo;
+        };
+        memoListEl.appendChild(div);
+      });
+    }
+
+    function saveSermon() {
+      const content = sermonText.value.trim();
+      if (!content) {
+        alert("설교 내용을 입력해 주세요.");
+        return;
+      }
+      localStorage.setItem("savedSermon", content);
+      alert("설교문이 저장되었습니다.");
+    }
+
+    function clearText() {
+      if (confirm("모든 내용을 지우시겠습니까?")) {
+        sermonText.value = "";
+      }
+    }
+
+    function printSermon() {
+      window.print();
+    }
+
+    function startVoice() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'ko-KR';
+      recognition.start();
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        sermonText.value += (sermonText.value ? "\n" : "") + transcript;
+      };
+      recognition.onerror = function(event) {
+        alert("음성 인식 오류: " + event.error);
+      };
+    }
+
+    async function generateOutline() {
+      const text = sermonText.value;
+      const result = await callAI(`"${text}"라는 주제로 설교 개요(서론, 본론, 결론)를 만들어줘.`);
+      document.getElementById("resultBox").innerText = result;
+    }
+
+    async function recommendBible() {
+      const text = sermonText.value;
+      const result = await callAI(`"${text}"와 관련된 성경 구절 3개를 추천해줘. 설명도 포함해서.`);
+      document.getElementById("resultBox").innerText = result;
+    }
+
+    async function callAI(userPrompt) {
+      const res = await fetch("https://sermon-api.openai-proxy.com/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: userPrompt })
+      });
+      const data = await res.json();
+      return data.result || "AI 응답을 불러오지 못했습니다.";
+    }
+
+    renderMemos();
+  </script>
+
+</body>
+</html>

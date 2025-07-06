@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>강해 설교 작성</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      font-family: 'Nanum Gothic', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      padding: 20px;
+      background: #111;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #00bcd4;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      padding: 20px;
+    }
+    .column {
+      flex: 1;
+      margin: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      resize: vertical;
+    }
+    button {
+      margin-top: 10px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      background-color: #00bcd4;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+    button:hover {
+      background-color: #0097a7;
+    }
+  </style>
+</head>
+<body>
+  <header>📖 강해 설교 작성</header>
+  <div class="container">
+    <div class="column">
+      <h3>성경 본문</h3>
+      <textarea placeholder="예: 요한복음 1:1"></textarea>
+      <button onclick="analyze()">원어/배경 분석</button>
+    </div>
+    <div class="column">
+      <h3>원어 해석 및 주석</h3>
+      <textarea placeholder="히브리어/헬라어 원어 분석 결과가 이곳에 표시됩니다..."></textarea>
+      <button onclick="addNote()">AI 주석 생성</button>
+    </div>
+    <div class="column">
+      <h3>설교문 작성</h3>
+      <textarea placeholder="AI 분석을 바탕으로 설교문을 작성해보세요..."></textarea>
+      <button onclick="saveSermon()">설교 저장</button>
+      <button onclick="editSermon()">설교 수정</button>
+      <button onclick="printSermon()">인쇄</button>
+
+    </div>
+  </div>
+
+  <script>
+    function analyze() {
+      alert("원어 및 배경 분석 기능은 준비 중입니다.");
+    }
+    function addNote() {
+      alert("AI 주석 기능은 곧 활성화됩니다.");
+    }
+    function saveSermon() {
+    function editSermon() {
+      alert("설교문을 수정합니다.");
+    }
+    function printSermon() {
+      window.print();
+    }
+
+      alert("설교문이 저장되었습니다.");
+    }
+  </script>
+</body>
+</html>

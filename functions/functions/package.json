@@ -1,0 +1,10 @@
+{
+  "name": "functions",
+  "description": "Firebase Functions for AI sermon processing",
+  "dependencies": {
+    "openai": "^4.27.0"
+  },
+  "engines": {
+    "node": "18"
+  }
+}

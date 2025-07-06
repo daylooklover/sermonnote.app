@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import WelcomeScreen from './components/WelcomeScreen';
+import WelcomeScreen from './WelcomeScreen';
 import AuthScreen from './components/AuthScreen';
 import SermonSelectionScreen from './components/SermonSelectionScreen';
 import SermonCreationScreen from './components/SermonCreationScreen';
