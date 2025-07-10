@@ -1,0 +1,13 @@
+{
+  "name": "functions",
+  "description": "Firebase Functions for sermonnote AI",
+  "dependencies": {
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.3.2",
+    "openai": "^5.8.2",
+    "react-scripts": "^5.0.1"
+  },
+  "engines": {
+    "node": "18"
+  }
+}

@@ -1,63 +1,62 @@
+// src/index.js
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // React 18+ 버전
-import './App.css'; // 필요하다면
-import App from './App'; // App 컴포넌트 임포트
+import ReactDOM from 'react-dom/client';
+import './App.css';
+import App from './App';
 
-
-// Firebase SDK v9+ 모듈식 임포트
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-
-// Firebase 설정 (환경 변수 사용)
-const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
-};
-
-// Firebase 앱 초기화 (중복 초기화 방지)
-let firebaseApp;
-let authService = null;
-let firestoreService = null;
-
-try {
-    if (!getApps().length) {
-        firebaseApp = initializeApp(firebaseConfig);
-        console.log('Firebase 앱 초기화 완료.');
-    } else {
-        firebaseApp = getApp();
-        console.log('Firebase 앱이 이미 초기화되어 있습니다.');
-    }
-
-    if (firebaseApp) {
-        authService = getAuth(firebaseApp);
-        firestoreService = getFirestore(firebaseApp);
-    }
-
-} catch (error) {
-    console.error("Firebase 초기화 중 심각한 오류 발생:", error);
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-        rootElement.innerHTML = `<p style="color: red; text-align: center; font-size: 1.2rem;">앱 로드 중 오류 발생: ${error.message}. 개발자 콘솔을 확인해주세요.</p>`;
-    }
-}
+import { firebaseApp, auth, firestore } from './firebase';
 
 const rootElement = document.getElementById('root');
-if (rootElement) {
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(
-        <React.StrictMode>
-            <App auth={authService} firestore={firestoreService} firebaseApp={firebaseApp} />
-        </React.StrictMode>
-    );
-} else {
-    console.error('ID가 "root"인 요소를 찾을 수 없어 React 앱을 마운트할 수 없습니다.');
-}
 
-// 성능 측정 (선택 사항) - reportWebVitals() 호출 제거됨
-// reportWebVitals();
+if (rootElement && firebaseApp) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App auth={auth} firestore={firestore} firebaseApp={firebaseApp} />
+    </React.StrictMode>
+  );
+} else {
+  console.error('⚠️ "root" 요소가 없거나 Firebase가 초기화되지 않았습니다.');
+}
+const functions = require("firebase-functions");
+const { Configuration, OpenAIApi } = require("openai");
+
+const configuration = new Configuration({
+  apiKey: "sk-...자기 API키...",
+});
+const openai = new OpenAIApi(configuration);
+
+exports.generateCommentary = functions.https.onRequest(async (req, res) => {
+  const { reference, text } = req.body;
+
+  if (!reference || !text) {
+    return res.status(400).send("reference and text required.");
+  }
+
+  const prompt = `
+[성경 주석 생성기]
+다음 성경 구절에 대해 다음과 같은 주석을 생성하세요:
+
+1. 해설 요점
+2. 적용
+3. 원어 설명
+
+[구절]: ${reference}
+[본문]: ${text}
+
+[주석]:
+`;
+
+  try {
+    const completion = await openai.createChatCompletion({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 500,
+    });
+
+    const result = completion.data.choices[0].message.content;
+    res.json({ commentary: result });
+  } catch (err) {
+    res.status(500).send("AI 주석 생성 실패: " + err.message);
+  }
+});

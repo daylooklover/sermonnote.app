@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>설교 작성 선택</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    .select-box {
+      background: #222;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      margin: auto;
+      box-shadow: 0 0 20px #444;
+    }
+    .option {
+      background-color: #333;
+      padding: 14px 20px;
+      margin: 15px 0;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      transition: background 0.3s;
+    }
+    .option:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div class="select-box">
+  <h2>설교 작성 선택</h2>
+  <div class="option" onclick="location.href='/sermon_expository'">✍ 강해설교 작성</div>
+  <div class="option" onclick="location.href='/custom_sermon'">🎯 맞춤형 설교 작성</div>
+  <div class="option" onclick="location.href='/sermon_linked_ai'">💡 퀵메모 연계 설교</div>
+</div>
+
+</body>
+</html>

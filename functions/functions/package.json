@@ -1,8 +1,10 @@
 {
   "name": "functions",
-  "description": "Firebase Functions for AI sermon processing",
+  "description": "Firebase Functions for SermonNote AI",
   "dependencies": {
-    "openai": "^4.27.0"
+    "firebase-admin": "^11.10.1",
+    "firebase-functions": "^3.23.0",
+    "openai": "^4.26.1"
   },
   "engines": {
     "node": "18"

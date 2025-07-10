@@ -1,204 +1,356 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>설교 작성 - 퀵메모 + AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>퀵메모 설교작성</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1YVJr-aPDADp-SgYtA9X2XagYoTTJn4M",
+      authDomain: "sermonnote-live.firebaseapp.com",
+      projectId: "sermonnote-live",
+      storageBucket: "sermonnote-live.appspot.com",
+      messagingSenderId: "924542148810",
+      appId: "1:924542148810:web:b9f0f6848eb333f24b1433"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
   <style>
+    html, body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; }
     body {
-      margin: 0;
       font-family: 'Nanum Gothic', sans-serif;
-      background: linear-gradient(135deg, #1c1c2b, #28313b);
-      color: #eee;
+      background: linear-gradient(135deg, #0a0f1a, #16213e);
+      color: #f0f0f0;
       display: flex;
-      height: 100vh;
     }
-
     .left-panel {
-      width: 300px;
-      background: #222;
+      width: 360px;
+      background: #0d1b2a;
       padding: 20px;
+      box-sizing: border-box;
       overflow-y: auto;
     }
-
-    .left-panel h2 {
-      font-size: 18px;
-      color: #ffe082;
-      margin-bottom: 10px;
-    }
-
-    .memo-item {
-      background: #333;
-      margin-bottom: 8px;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .memo-item:hover {
-      background: #444;
-    }
-
     .right-panel {
       flex: 1;
       padding: 30px;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
     }
-
-    .right-panel h1 {
-      font-size: 22px;
-      margin-bottom: 16px;
-      color: #fff176;
-    }
-
-    textarea {
-      flex: 1;
-      padding: 20px;
-      font-size: 16px;
-      border-radius: 10px;
-      background: #111;
-      color: #eee;
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 14px;
       border: none;
-      resize: none;
-      box-shadow: inset 0 0 10px #555;
+      border-radius: 4px;
+      font-size: 18px;
+      background: #1e2a3a;
+      color: #f0f0f0;
     }
-
-    .button-bar {
-      margin-top: 15px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
     button {
-      padding: 10px 16px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      padding: 10px 18px;
+      background: #0077b6;
+      color: #fff;
       border: none;
-      border-radius: 8px;
-      font-weight: bold;
+      border-radius: 4px;
       cursor: pointer;
-      background-color: #ffeb3b;
-      color: #000;
+      font-size: 15px;
     }
-
-    button:hover {
-      background-color: #fff176;
+    .memo-item {
+      background: #1e2a3a;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-
-    #resultBox {
-      margin-top: 20px;
-      padding: 15px;
-      background: #222;
-      border-radius: 10px;
-      white-space: pre-line;
+    .memo-text { flex: 1; cursor: pointer; }
+    .delete-btn {
+      background: transparent;
+      color: #f55;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
     }
+    #statusMsg {
+  color: lightgreen;
+  margin-top: auto;
+  font-size: 16px;
+  padding-top: 10px;
+  border-top: 1px solid #344b63;
+}
   </style>
 </head>
 <body>
-
   <div class="left-panel">
-    <h2>📝 퀵메모</h2>
+    <h3>📁 퀵메모</h3>
     <div id="memoList"></div>
+    <hr style="margin: 15px 0; border-color: #344b63">
+    <button onclick="generateSermon()">🧠 설교문 작성</button>
+    <button onclick="recommendHymn()">🎵 찬송가 추천</button>
+    <input type="text" id="bibleRange" placeholder="예: 요한복음 3장 16~18절">
+    <button onclick="fetchBibleRange()">📘 성경 범위 불러오기</button>
   </div>
-
   <div class="right-panel">
-    <h1>📖 설교문 작성</h1>
-    <textarea id="sermonText" placeholder="설교문을 작성하거나 퀵메모를 삽입할 수 있습니다."></textarea>
-
-    <div class="button-bar">
-      <button onclick="saveSermon()">저장</button>
-      <button onclick="clearText()">초기화</button>
+    <h2>📘 설교문 작성</h2>
+    <input type="text" id="sermonTitle" placeholder="설교 제목을 입력하세요">
+    <input type="text" id="sermonDate" placeholder="설교 날짜를 입력하세요 (예: 2025-07-10)">
+    <textarea id="sermonText" rows="30" placeholder="여기에 설교문을 작성하세요..."></textarea>
+    <div>
+      <button onclick="saveToFirebase()">Firebase 저장</button>
+      <button onclick="grammarCorrect()">문법 교정</button>
+      <button onclick="summarizeSermon()">요약/정리</button>
       <button onclick="printSermon()">인쇄</button>
-      <button onclick="generateOutline()">✍ 설교 개요 생성</button>
-      <button onclick="recommendBible()">📖 성경구절 추천</button>
-      <button onclick="startVoice()">🎤 음성으로 주제 말하기</button>
+      <button onclick="saveAsPDF()">PDF 저장</button>
     </div>
-
-    <div id="resultBox">💡 AI 결과가 여기에 표시됩니다...</div>
+    <div id="statusMsg"></div>
   </div>
-
   <script>
-    const memoListEl = document.getElementById("memoList");
+    const memoListDiv = document.getElementById("memoList");
     const sermonText = document.getElementById("sermonText");
-
-    const quickmemos = JSON.parse(localStorage.getItem("quickmemos")) || [
-      "하나님의 은혜는 무한합니다.",
-      "믿음은 시련을 견디게 합니다.",
-      "사랑은 모든 것을 이깁니다."
-    ];
+    const sermonTitle = document.getElementById("sermonTitle");
+    const statusMsg = document.getElementById("statusMsg");
 
     function renderMemos() {
-      memoListEl.innerHTML = "";
-      quickmemos.forEach((memo) => {
+      memoListDiv.innerHTML = "";
+      const memos = JSON.parse(localStorage.getItem("quickMemos")) || [];
+      memos.slice(0, 5).forEach((memo, index) => {
         const div = document.createElement("div");
         div.className = "memo-item";
-        div.textContent = memo;
-        div.onclick = () => {
-          sermonText.value += (sermonText.value ? "\n" : "") + memo;
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "memo-text";
+        textSpan.textContent = memo;
+        textSpan.onclick = () => {
+          sermonTitle.value = memo;
+          sermonText.value = `📝 퀵메모에서 가져온 설교: ${memo}
+
+`; // 완전 새로 시작
+          statusMsg.textContent = "⏳ 설교문 생성 중입니다...";
+          generateSermon();
         };
-        memoListEl.appendChild(div);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.innerHTML = "❌";
+        deleteBtn.onclick = () => {
+          memos.splice(index, 1);
+          localStorage.setItem("quickMemos", JSON.stringify(memos));
+          renderMemos();
+        };
+
+        div.appendChild(textSpan);
+        div.appendChild(deleteBtn);
+        memoListDiv.appendChild(div);
       });
     }
 
-    function saveSermon() {
-      const content = sermonText.value.trim();
-      if (!content) {
-        alert("설교 내용을 입력해 주세요.");
-        return;
-      }
-      localStorage.setItem("savedSermon", content);
-      alert("설교문이 저장되었습니다.");
-    }
+    function generateSermon() {
+  const topic = sermonTitle.value.trim();
+  if (!topic) return alert("먼저 설교 제목을 입력해주세요.");
+  statusMsg.textContent = "⏳ 설교문 생성 중입니다...";
 
-    function clearText() {
-      if (confirm("모든 내용을 지우시겠습니까?")) {
-        sermonText.value = "";
-      }
-    }
+  const prompt = `${topic}에 대해 강해식 설교 스타일로 2단계로 나눠 작성해줘.
+1단계: 개요, 본문 해석
+2단계: 적용, 묵상, 추천 찬송가 제안`;
 
-    function printSermon() {
-      window.print();
-    }
+  fetch("https://us-central1-sermonnote-live.cloudfunctions.net/ai", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, max_tokens: 2000, temperature: 0.5 })
+  })
+    .then(res => res.json())
+    .then(data1 => {
+      sermonText.value += `
 
-    function startVoice() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'ko-KR';
-      recognition.start();
-      recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        sermonText.value += (sermonText.value ? "\n" : "") + transcript;
-      };
-      recognition.onerror = function(event) {
-        alert("음성 인식 오류: " + event.error);
-      };
-    }
-
-    async function generateOutline() {
-      const text = sermonText.value;
-      const result = await callAI(`"${text}"라는 주제로 설교 개요(서론, 본론, 결론)를 만들어줘.`);
-      document.getElementById("resultBox").innerText = result;
-    }
-
-    async function recommendBible() {
-      const text = sermonText.value;
-      const result = await callAI(`"${text}"와 관련된 성경 구절 3개를 추천해줘. 설명도 포함해서.`);
-      document.getElementById("resultBox").innerText = result;
-    }
-
-    async function callAI(userPrompt) {
-      const res = await fetch("https://sermon-api.openai-proxy.com/generate", {
+${data1.result || '⚠️ 1단계 설교 생성 실패'}`;
+      return fetch("https://us-central1-sermonnote-live.cloudfunctions.net/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userPrompt })
+        body: JSON.stringify({
+          prompt: `${topic} 설교의 후반부를 작성해줘.
+내용: 적용 → 묵상 → 추천 찬송가 포함`,
+          max_tokens: 2000,
+          temperature: 0.5
+        })
       });
-      const data = await res.json();
-      return data.result || "AI 응답을 불러오지 못했습니다.";
-    }
+    })
+    .then(res => res.json())
+    .then(data2 => {
+      sermonText.value += `
 
-    renderMemos();
-  </script>
+${data2.result || '⚠️ 2단계 설교 생성 실패'}`;
+      statusMsg.textContent = "✅ 설교문이 성공적으로 생성되었습니다.";
+    })
+    .catch(err => {
+      alert("AI 오류: " + err);
+      statusMsg.textContent = "❌ 설교문 생성에 실패했습니다.";
+    });
+}
 
-</body>
+window.onload = () => {
+  renderMemos();
+};
+ function grammarCorrect() {
+  const text = sermonText.value.trim();
+  if (!text) return alert("설교문이 비어 있습니다");
+
+  statusMsg.textContent = "✍ 문법 교정 중입니다...";
+  fetch("https://us-central1-sermonnote-live.cloudfunctions.net/ai", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt: `다음 한국어 설교문 내용을 자연스럽고 문법적으로 고쳐줘:\n\n${text}`,
+      max_tokens: 2000,
+      temperature: 0.3
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      sermonText.value = data.result || text;
+      statusMsg.textContent = "✅ 문법 교정이 완료되었습니다.";
+    })
+    .catch(err => {
+      alert("문법 교정 오류: " + err);
+      statusMsg.textContent = "❌ 문법 교정 실패";
+    });
+}
+ function fetchBibleRange() {
+  const rangeInput = document.getElementById("bibleRange").value.trim();
+  const match = rangeInput.match(/(.+?)\s*(\d+)장\s*(\d+)(?:[~\-](\d+))?절?/);
+  if (!match) {
+    alert("성경 범위를 올바르게 입력해주세요 (예: 요한복음 3장 16절)");
+    return;
+  }
+  const [_, bookKor, chapter, verseStart, verseEnd] = match;
+  const bookMap = {
+    "창세기": "Genesis", "출애굽기": "Exodus", "레위기": "Leviticus", "민수기": "Numbers",
+    "신명기": "Deuteronomy", "마태복음": "Matthew", "마가복음": "Mark",
+    "누가복음": "Luke", "요한복음": "John"
+  };
+ // 영어 → 한글 책 이름 매핑
+const bookMap = {
+  "Genesis": "창세기",
+  "Exodus": "출애굽기",
+  "Leviticus": "레위기",
+  "Numbers": "민수기",
+  "Deuteronomy": "신명기",
+  "Joshua": "여호수아",
+  "Judges": "사사기",
+  "Ruth": "룻기",
+  "1 Samuel": "사무엘상",
+  "2 Samuel": "사무엘하",
+  "1 Kings": "열왕기상",
+  "2 Kings": "열왕기하",
+  "1 Chronicles": "역대상",
+  "2 Chronicles": "역대하",
+  "Ezra": "에스라",
+  "Nehemiah": "느헤미야",
+  "Esther": "에스더",
+  "Job": "욥기",
+  "Psalms": "시편",
+  "Proverbs": "잠언",
+  "Ecclesiastes": "전도서",
+  "Song of Songs": "아가",
+  "Isaiah": "이사야",
+  "Jeremiah": "예레미야",
+  "Lamentations": "예레미야애가",
+  "Ezekiel": "에스겔",
+  "Daniel": "다니엘",
+  "Hosea": "호세아",
+  "Joel": "요엘",
+  "Amos": "아모스",
+  "Obadiah": "오바댜",
+  "Jonah": "요나",
+  "Micah": "미가",
+  "Nahum": "나훔",
+  "Habakkuk": "하박국",
+  "Zephaniah": "스바냐",
+  "Haggai": "학개",
+  "Zechariah": "스가랴",
+  "Malachi": "말라기",
+  "Matthew": "마태복음",
+  "Mark": "마가복음",
+  "Luke": "누가복음",
+  "John": "요한복음",
+  "Acts": "사도행전",
+  "Romans": "로마서",
+  "1 Corinthians": "고린도전서",
+  "2 Corinthians": "고린도후서",
+  "Galatians": "갈라디아서",
+  "Ephesians": "에베소서",
+  "Philippians": "빌립보서",
+  "Colossians": "골로새서",
+  "1 Thessalonians": "데살로니가전서",
+  "2 Thessalonians": "데살로니가후서",
+  "1 Timothy": "디모데전서",
+  "2 Timothy": "디모데후서",
+  "Titus": "디도서",
+  "Philemon": "빌레몬서",
+  "Hebrews": "히브리서",
+  "James": "야고보서",
+  "1 Peter": "베드로전서",
+  "2 Peter": "베드로후서",
+  "1 John": "요한일서",
+  "2 John": "요한이서",
+  "3 John": "요한삼서",
+  "Jude": "유다서",
+  "Revelation": "요한계시록"
+};
+
+let krvJson = {};
+
+fetch('/krv.json')
+  .then(res => res.json())
+  .then(data => krvJson = data)
+  .catch(err => console.error('KRV 로딩 오류:', err));
+
+function fetchVerse() {
+  const input = document.getElementById('verseInput').value.trim();
+  const [engBook, chapterVerse] = input.split(/ (?=\d)/); // "Genesis 1:1"
+  const korBook = bookMap[engBook];
+
+  if (!korBook) {
+    document.getElementById('verseResult').textContent = '성경 책을 찾을 수 없습니다.';
+    return;
+  }
+
+  const key = `${korBook} ${chapterVerse}`;
+  const verse = krvJson[key];
+  document.getElementById('verseResult').textContent = verse || '해당 구절을 찾을 수 없습니다.';
+}
+
+  const bookEng = bookMap[bookKor.trim()] || bookKor.trim();
+  const reference = verseEnd ? `${chapter}:${verseStart}-${verseEnd}` : `${chapter}:${verseStart}`;
+  const url = `https://bible-api.com/${bookEng}+${reference}`;
+
+  statusMsg.textContent = "📘 성경 본문 불러오는 중...";
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      sermonText.value += `\n\n📘 성경 본문: ${data.text}`;
+      statusMsg.textContent = "✅ 성경 본문이 추가되었습니다.";
+    })
+    .catch(err => {
+      alert("성경 API 오류: " + err);
+      statusMsg.textContent = "❌ 본문 불러오기 실패";
+    });
+    <input id="rangeInput" placeholder="예: 로마서 8:28~30" />
+<button onclick="searchRange()">📖 구절 검색</button>
+<pre id="bibleResult"></pre>
+<button onclick="insertToSermon()">📝 설교문에 삽입</button>
+
+<textarea id="sermonText" rows="15" style="width:100%;"></textarea>
+
+}
+</script>
+ </body>
 </html>

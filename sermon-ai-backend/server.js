@@ -38,3 +38,4 @@ app.post('/api/generate', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+console.log('OpenAI API Key:', process.env.OPENAI_API_KEY ? '설정됨' : '없음');

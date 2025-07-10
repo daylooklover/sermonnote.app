@@ -1,39 +1,43 @@
 const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const express = require("express");
-const cors = require("cors");
-const { OpenAI } = require("openai");  // ✅ 최신 openai 방식
+const OpenAI = require("openai");
 
-admin.initializeApp();
-const app = express();
-app.use(cors({ origin: true }));
-app.use(express.json());
+// 🔐 OpenAI 초기화
+const openai = new OpenAI({ apiKey: functions.config().openai.key });
 
-const openai = new OpenAI({
-  apiKey: functions.config().openai.key, // 🔐 Firebase 환경변수 사용
-});
-
-app.post("/generate", async (req, res) => {
+// 📘 Firebase HTTPS 함수
+exports.generateCommentary = functions.https.onRequest(async (req, res) => {
   try {
-    const prompt = req.body.prompt;
-    if (!prompt) {
-      return res.status(400).send("Prompt is required");
+    const { reference, text } = req.body;
+
+    if (!reference || !text) {
+      return res.status(400).send("❌ 'reference'와 'text'가 필요합니다.");
     }
 
-    const chatCompletion = await openai.chat.completions.create({
+    const prompt = `
+[성경 주석 생성기]
+다음 성경 구절에 대해 다음을 포함한 AI 주석을 생성하세요:
+
+1. 핵심 해설
+2. 원어 단어 및 의미
+3. 현대적인 적용 포인트
+
+[구절]: ${reference}
+[본문]: ${text}
+
+[주석]:
+    `;
+
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 300,
-      temperature: 0.7,
+      max_tokens: 500,
     });
 
-    const result = chatCompletion.choices[0].message.content;
-    res.status(200).json({ result });
+    const result = completion.choices[0].message.content;
+    return res.status(200).json({ commentary: result });
+
   } catch (error) {
-    console.error("Error from OpenAI:", error.message);
-    res.status(500).send("Internal Server Error");
+    console.error("🔥 AI 오류:", error.message);
+    return res.status(500).send("AI 주석 생성 실패: " + error.message);
   }
 });
-
-// Firebase Functions로 export
-exports.ai = functions.https.onRequest(app);

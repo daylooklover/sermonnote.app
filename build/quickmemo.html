@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>📑 퀵메모</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Pretendard', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 40px;
+      font-size: 2rem;
+    }
+
+    textarea {
+      width: 80%;
+      height: 120px;
+      background-color: #222;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      margin-top: 20px;
+      resize: none;
+      font-size: 1rem;
+      border-radius: 10px;
+    }
+
+    .count {
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .button-group {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .voice-button {
+      background-color: #ffcc00;
+    }
+
+    .save-button {
+      background-color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 퀵메모</h1>
+
+  <textarea id="memoInput" maxlength="20" placeholder="메모를 입력하세요 (20자 이내)" oninput="updateCount()"></textarea>
+  <div class="count"><span id="charCount">0</span> / 20</div>
+
+  <div class="button-group">
+    <button class="voice-button" onclick="startVoiceInput()">🎤 음성입력</button>
+    <button class="save-button" onclick="saveMemo()">저장</button>
+  </div>
+
+  <script>
+    function updateCount() {
+      const input = document.getElementById("memoInput");
+      document.getElementById("charCount").textContent = input.value.length;
+    }
+
+    function saveMemo() {
+      const input = document.getElementById("memoInput");
+      const value = input.value.trim();
+      if (!value) return alert("메모를 입력해주세요!");
+
+      let memos = JSON.parse(localStorage.getItem("quickmemos")) || [];
+      memos.push(value);
+      localStorage.setItem("quickmemos", JSON.stringify(memos));
+
+      alert("✅ 메모가 저장되었습니다!");
+      input.value = "";
+      updateCount();
+    }
+
+    function startVoiceInput() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("⚠ 음성 인식이 지원되지 않는 브라우저입니다.");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = "ko-KR";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = function(event) {
+        const result = event.results[0][0].transcript;
+        document.getElementById("memoInput").value = result.substring(0, 20);
+        updateCount();
+      };
+
+      recognition.onerror = function(event) {
+        alert("🎤 음성 인식 오류: " + event.error);
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>

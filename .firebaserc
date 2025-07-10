@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "sermonnote-live"
+  },
+  "targets": {
+    "sermonnote-live": {
+      "hosting": {
+        "sermonnote-live": [
+          "sermonnote-live"
+        ]
+      }
+    }
   }
 }

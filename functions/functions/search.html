@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>성경 구절 검색 (KRV)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+      background: #f4f4f4;
+      padding: 2em;
+    }
+    input, button {
+      font-size: 1.2em;
+      padding: 0.5em;
+      margin: 0.5em 0;
+    }
+    #result {
+      margin-top: 1em;
+      white-space: pre-wrap;
+      background: #fff;
+      padding: 1em;
+      border-radius: 8px;
+      box-shadow: 0 0 5px #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h2>📖 한글 성경 구절 검색 (개역한글 KRV)</h2>
+  <input type="text" id="searchInput" placeholder="예: 요한복음 3:16" />
+  <button onclick="searchVerse()">구절 검색</button>
+  <div id="result">여기에 결과가 표시됩니다.</div>
+
+  <script src="bookMap.js"></script>
+  <script>
+    async function searchVerse() {
+      const input = document.getElementById("searchInput").value.trim();
+      const resultBox = document.getElementById("result");
+      const match = input.match(/(\S+)\s*(\d+):(\d+)/);
+      if (!match) {
+        resultBox.innerText = "⚠️ 형식이 올바르지 않습니다. (예: 요한복음 3:16)";
+        return;
+      }
+      const [_, bookKr, chapter, verse] = match;
+      const bookEn = bookMap[bookKr];
+      if (!bookEn) {
+        resultBox.innerText = "❌ 해당 성경 책이 존재하지 않습니다.";
+        return;
+      }
+
+      const res = await fetch('krv_full_demo.json');
+      const data = await res.json();
+      const found = data.find(v =>
+        v.book_en === bookEn &&
+        v.chapter === parseInt(chapter) &&
+        v.verse === parseInt(verse)
+      );
+      if (found) {
+        resultBox.innerText = `📘 ${found.book_kr} ${found.chapter}:${found.verse}
+
+${found.text}`;
+      } else {
+        resultBox.innerText = "❌ 해당 구절을 찾을 수 없습니다.";
+      }
+    }
+    async function getAICommentary(reference, text) {
+  const response = await fetch("https://us-central1-YOUR_PROJECT.cloudfunctions.net/generateCommentary", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reference, text })
+  });
+  const data = await response.json();
+  return data.commentary;
+}
+
+  </script>
+</body>
+</html>

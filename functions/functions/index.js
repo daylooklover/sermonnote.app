@@ -1,29 +1,23 @@
 const functions = require("firebase-functions");
-const { Configuration, OpenAIApi } = require("openai");
+const { OpenAI } = require("openai");
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: functions.config().openai.key,
 });
-const openai = new OpenAIApi(configuration);
 
 exports.ai = functions.https.onRequest(async (req, res) => {
   try {
     const prompt = req.body.prompt;
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt is required" });
-    }
 
-    const completion = await openai.createChatCompletion({
-      model: "gpt-4o",
+    const chat = await openai.chat.completions.create({
+      model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 1024,
-      temperature: 0.7,
+      max_tokens: 300,
     });
 
-    const result = completion.data.choices[0].message.content;
-    res.status(200).send({ result });
-  } catch (error) {
-    console.error("AI 호출 실패:", error);
-    res.status(500).send({ error: "AI 호출 실패" });
+    res.status(200).json({ result: chat.choices[0].message.content });
+  } catch (err) {
+    console.error("❌ AI 호출 오류:", err);
+    res.status(500).json({ error: "AI 처리 중 오류 발생" });
   }
 });

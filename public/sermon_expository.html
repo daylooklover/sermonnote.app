@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>강해 설교 작성</title>
+    <style>
+      :root {
+        --bg-top: #0a0f1a;
+        --bg-bottom: #142030;
+        --panel: #121e2a;
+        --primary: #29b6f6;
+        --btn: #007b8a;
+        --btn-hover: #0096a8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 30px;
+        font-family: "Nanum Gothic", sans-serif;
+        background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
+        color: #f0f0f0;
+      }
+      h2 {
+        color: var(--primary);
+        text-align: center;
+        margin: 0;
+      }
+      label {
+        display: block;
+        margin: 20px 0 6px;
+      }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: space-between;
+        margin-top: 40px;
+      }
+      .section {
+        flex: 1 1 420px;
+        min-width: 320px;
+        display: flex;
+        flex-direction: column;
+      }
+      textarea,
+      input[type="text"] {
+        background: var(--panel);
+        border: none;
+        padding: 12px;
+        color: #f0f0f0;
+        font-size: 15px;
+        border-radius: 6px;
+        resize: both;
+      }
+      textarea {
+        min-height: 140px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 15px;
+        border: none;
+        border-radius: 5px;
+        background: var(--btn);
+        color: #fff;
+        cursor: pointer;
+      }
+      button:hover {
+        background: var(--btn-hover);
+      }
+      .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      pre {
+        background: var(--panel);
+        padding: 12px;
+        border-radius: 6px;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        min-height: 140px;
+      }
+      /* 모바일 대응 */
+      @media (max-width: 600px) {
+        button {
+          flex: 1 1 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>📖 강해 설교 작성</h2>
+
+    <!-- 단일 구절 불러오기 -->
+    <label for="bibleInput">성경 입력 (예: 요한복음 3장 16절)</label>
+    <div class="button-group" style="margin: 0 0 10px 0">
+      <input
+        type="text"
+        id="bibleInput"
+        placeholder="예: 요한복음 3장 16절"
+        style="flex: 1 1 250px"
+      />
+      <button onclick="loadBibleText()">📘 말씀 불러오기</button>
+    </div>
+    <textarea
+      id="bibleText"
+      placeholder="📖 성경 구절이 여기에 표시됩니다..."
+      onmouseup="handleSelection()"
+    ></textarea>
+
+    <!-- 구절 범위 검색 -->
+    <label for="rangeInput">구절 범위 (예: 로마서 8:28~30)</label>
+    <div class="button-group" style="margin: 0 0 10px 0">
+      <input
+        id="rangeInput"
+        placeholder="예: 로마서 8:28~30"
+        style="flex: 1 1 250px"
+      />
+      <button onclick="searchRange()">🔍 구절 검색</button>
+      <button onclick="insertRangeToSermon()">📝 설교문에 삽입</button>
+    </div>
+    <pre id="bibleResult"></pre>
+
+    <div class="container">
+      <!-- AI 주석 -->
+      <div class="section">
+        <h3>AI 주석</h3>
+        <textarea id="aiResult" placeholder="AI 분석 결과가 여기에 표시됩니다..."></textarea>
+        <div class="button-group">
+          <button onclick="callAI()">AI 주석 생성</button>
+          <button onclick="insertAiToSermon()">📥 설교문에 삽입</button>
+        </div>
+      </div>
+
+      <!-- 설교문 -->
+      <div class="section">
+        <h3>설교문 작성</h3>
+        <textarea id="sermonText" placeholder="AI 분석을 바탕으로 설교문을 작성해보세요..."></textarea>
+        <div class="button-group">
+          <button onclick="saveToFirebase()">Firebase 저장</button>
+          <button onclick="window.print()">🖨 인쇄</button>
+          <button onclick="exportToPDF()">PDF 저장</button>
+          <button onclick="correctGrammar()">문법 교정</button>
+          <button onclick="summarizeSermon()">요약/정리</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <script>
+      /**************** Firebase 초기화 ****************/
+      const firebaseConfig = {
+        apiKey: "AIzaSyB1YVJr-aPDADp-SgYtA9X2XagYoTTJn4M",
+        authDomain: "sermonnote-live.firebaseapp.com",
+        projectId: "sermonnote-live"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      /**************** 공통 데이터 ****************/
+      const mapping = {
+        "창세기": "Genesis",
+        "출애굽기": "Exodus",
+        "레위기": "Leviticus",
+        "민수기": "Numbers",
+        "신명기": "Deuteronomy",
+        "마태복음": "Matthew",
+        "마가복음": "Mark",
+        "누가복음": "Luke",
+        "요한복음": "John",
+        "로마서": "Romans",
+        "시편": "Psalms",
+        "잠언": "Proverbs"
+        // 필요 시 추가
+      };
+
+      /**************** 단일 구절 ****************/
+      function convertToEnglishRef(korean) {
+        const regex = /([가-힣]+)\s*(\d+)장\s*(\d+)절/;
+        const match = korean.match(regex);
+        if (!match) return "";
+        const [, bookKr, chap, verse] = match;
+        const bookEn = mapping[bookKr] || "";
+        return `${bookEn} ${chap}:${verse}`;
+      }
+
+      async function loadBibleText() {
+        const krText = document.getElementById("bibleInput").value.trim();
+        const bibleText = document.getElementById("bibleText");
+        if (!krText) return (bibleText.value = "⚠️ 입력이 비어있습니다.");
+        bibleText.value = "📖 불러오는 중...";
+        try {
+          const res = await fetch("/krv.json");
+          const json = await res.json();
+          const engKey = convertToEnglishRef(krText);
+          const verse = json[engKey];
+          bibleText.value = verse || "❌ 성경 구절을 찾을 수 없습니다.";
+        } catch (e) {
+          bibleText.value = "❌ 오류: " + e.message;
+        }
+      }
+
+      /**************** 범위 구절 ****************/
+      function parseKoreanRange(korean) {
+        const regex = /([가-힣]+)\s*(\d+):(\d+)\s*~\s*(\d+)/;
+        const match = korean.match(regex);
+        if (!match) return null;
+        const [, bookKr, chap, verseStart, verseEnd] = match;
+        const bookEn = mapping[bookKr] || "";
+        return {
+          book: bookEn,
+          chapter: chap,
+          start: parseInt(verseStart),
+          end: parseInt(verseEnd)
+        };
+      }
+
+      async function searchRange() {
+        const input = document.getElementById("rangeInput").value.trim();
+        const resultArea = document.getElementById("bibleResult");
+        if (!input) return (resultArea.textContent = "⚠️ 입력이 비어있습니다.");
+        resultArea.textContent = "📖 불러오는 중...";
+        const parsed = parseKoreanRange(input);
+        if (!parsed) {
+          resultArea.textContent = "❌ 구절 형식이 잘못되었습니다.";
+          return;
+        }
+        try {
+          const res = await fetch("/krv.json");
+          const data = await res.json();
+          let output = "";
+          for (let i = parsed.start; i <= parsed.end; i++) {
+            const key = `${parsed.book} ${parsed.chapter}:${i}`;
+            const verse = data[key];
+            if (verse) output += `${key} - ${verse}\n`;
+          }
+          resultArea.textContent = output || "❌ 해당 구절이 없습니다.";
+        } catch (e) {
+          resultArea.textContent = "❌ 오류: " + e.message;
+        }
+      }
+
+      function insertRangeToSermon() {
+        const text = document.getElementById("bibleResult").textContent;
+        const sermon = document.getElementById("sermonText");
+        sermon.value += "\n\n" + text;
+      }
+
+      /**************** AI 기능 ****************/
+      async function callAI() {
+        const text = document.getElementById("bibleText").value.trim();
+        const aiArea = document.getElementById("aiResult");
+        if (!text) return (aiArea.value = "⚠️ 분석할 본문이 없습니다.");
+        aiArea.value = "🔄 AI 분석 중...";
+        try {
+          const res = await fetch("/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: text })
+          });
+          const data = await res.json();
+          aiArea.value = data.result || "✅ 결과 없음";
+        } catch (e) {
+          aiArea.value = "❌ AI 호출 실패: " + e.message;
+        }
+      }
+
+      function insertAiToSermon() {
+        const ai = document.getElementById("aiResult").value;
+        const sermon = document.getElementById("sermonText");
+        sermon.value += `\n\n[AI 주석]\n${ai}`;
+      }
+
+      async function handleSelection() {
+        const selection = window.getSelection().toString();
+        if (selection.length === 0) return;
+        try {
+          const res = await fetch("/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: `이 성경 구절을 주석해줘: ${selection}` })
+          });
+          const data = await res.json();
+          document.getElementById("aiResult").value += `\n\n[주석] ${selection}:\n${data.result}`;
+        } catch (err) {
+          console.error("주석 오류:", err);
+        }
+      }
+
+      /**************** 저장 & 보조 기능 ****************/
+      async function saveToFirebase() {
+        const content = document.getElementById("sermonText").value;
+        if (!content.trim()) return alert("⚠️ 설교문이 비어있습니다.");
+        await db.collection("sermons").add({ content, timestamp: new Date() });
+        alert("✅ 저장 완료!");
+      }
+
+      function exportToPDF() {
+        import("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js").then(
+          ({ default: html2pdf }) => {
+            const element = document.getElementById("sermonText");
+            html2pdf().from(element.value).save("sermon.pdf");
+          }
+        );
+      }
+
+      function correctGrammar() {
+        alert("🛠 문법 교정 기능은 추후 추가 예정입니다.");
+      }
+
+      function summarizeSermon() {
+        const txt = document.getElementById("sermonText").value;
+        alert("📝 요약 기능은 추후 추가 예정입니다.\n\n미리보기를 보여드립니다:\n" + txt.slice(0, 200) + "...");
+      }
+    </script>
+  </body>
+</html>

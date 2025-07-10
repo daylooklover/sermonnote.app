@@ -1,0 +1,51 @@
+[
+  {
+    "book_kr": "창세기",
+    "book_en": "genesis",
+    "chapter": 1,
+    "verse": 1,
+    "text": "태초에 하나님이 천지를 창조하시니라"
+  },
+  {
+    "book_kr": "창세기",
+    "book_en": "genesis",
+    "chapter": 1,
+    "verse": 2,
+    "text": "땅이 혼돈하고 공허하며 흑암이 깊음 위에 있고 하나님의 신은 수면 위에 운행하시니라"
+  },
+  {
+    "book_kr": "창세기",
+    "book_en": "genesis",
+    "chapter": 1,
+    "verse": 3,
+    "text": "하나님이 이르시되 빛이 있으라 하시니 빛이 있었고"
+  },
+  {
+    "book_kr": "출애굽기",
+    "book_en": "exodus",
+    "chapter": 20,
+    "verse": 1,
+    "text": "하나님이 이 모든 말씀으로 말씀하여 이르시되"
+  },
+  {
+    "book_kr": "출애굽기",
+    "book_en": "exodus",
+    "chapter": 20,
+    "verse": 2,
+    "text": "나는 너를 애굽 땅 종 되었던 집에서 인도하여 낸 네 하나님 여호와니라"
+  },
+  {
+    "book_kr": "요한복음",
+    "book_en": "john",
+    "chapter": 3,
+    "verse": 16,
+    "text": "하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라"
+  },
+  {
+    "book_kr": "요한계시록",
+    "book_en": "revelation",
+    "chapter": 22,
+    "verse": 21,
+    "text": "주 예수의 은혜가 모든 자들에게 있을지어다 아멘"
+  }
+]

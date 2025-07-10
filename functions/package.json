@@ -1,19 +1,15 @@
 {
   "name": "functions",
-  "description": "Firebase AI server for SermonNote",
-  "main": "index.js",
-  "scripts": {
-    "start": "firebase emulators:start --only functions"
+  "description": "Firebase Functions for sermonnote AI",
+  "dependencies": {
+    "firebase-admin": "^11.10.1",
+    "firebase-functions": "^6.3.2",
+    "openai": "^5.8.2"
   },
   "engines": {
-    "node": "18"
+    "node": "20"
   },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "firebase-admin": "^11.10.1",
-    "firebase-functions": "^4.5.0",
-    "openai": "^4.38.1"
-  },
-  "private": true
+  "scripts": {
+    "lint": "echo \"Lint skipped\""
+  }
 }

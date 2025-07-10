@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>📖 강해설교 작성</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    #bible-area {
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      user-select: text;
+    }
+    #result-box {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #333;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 16px;
+      margin: 10px 6px 0 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .insert-btn { background-color: #007b7f; color: white; }
+    .save-btn { background-color: darkgreen; color: white; }
+    .print-btn { background-color: darkred; color: white; }
+    .ai-btn { background-color: #4444aa; color: white; }
+  </style>
+</head>
+<body>
+
+  <h1>📖 강해설교 작성</h1>
+
+  <label>설교 제목</label>
+  <input id="title" type="text" placeholder="예: 창세기 1장의 복음적 의미" />
+
+  <label>본문 성경구절</label>
+  <div id="bible-area">
+    태초에 하나님이 천지를 창조하시니라. (창세기 1:1)
+  </div>
+
+  <div id="result-box" style="display:none;">
+    <strong>🧠 AI 분석 결과:</strong>
+    <p id="ai-output"></p>
+    <button class="insert-btn" onclick="insertToBody()">본문에 추가</button>
+  </div>
+
+  <label>설교 내용</label>
+  <textarea id="body" rows="10" placeholder="본문에 대한 설교 내용을 작성하세요..."></textarea>
+
+  <!-- AI 버튼들 -->
+  <div>
+    <button class="ai-btn" onclick="summarize()">✂ 요약</button>
+    <button class="ai-btn" onclick="correctGrammar()">🔤 문법 교정</button>
+    <button class="ai-btn" onclick="generateStructure()">🧠 설교 구조 생성</button>
+  </div>
+
+  <div>
+    <button class="save-btn" onclick="saveSermon()">저장</button>
+    <button class="print-btn" onclick="window.print()">인쇄</button>
+  </div>
+
+  <script>
+    const aiEndpoint = "/ai"; // ✅ 수정 완료
+
+    document.getElementById('bible-area').addEventListener('mouseup', async () => {
+      const selectedText = window.getSelection().toString().trim();
+      if (selectedText.length > 0) {
+        document.getElementById('ai-output').textContent = "🔄 분석 중...";
+        document.getElementById('result-box').style.display = 'block';
+        try {
+          const res = await fetch(aiEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: `헬라어/히브리어 또는 주석 관점에서 "${selectedText}"에 대해 설명해줘.`,
+              role: "exegesis"
+            })
+          });
+          const data = await res.json();
+          document.getElementById('ai-output').textContent = data.result;
+        } catch (err) {
+          document.getElementById('ai-output').textContent = "❌ 오류 발생: " + err;
+        }
+      }
+    });
+
+    function insertToBody() {
+      const explanation = document.getElementById('ai-output').textContent;
+      const textarea = document.getElementById('body');
+      textarea.value += "\n\n📌 주석: " + explanation;
+    }
+
+    function saveSermon() {
+      const title = document.getElementById('title').value;
+      const body = document.getElementById('body').value;
+      alert("✅ 설교가 로컬에 임시 저장되었습니다!");
+      localStorage.setItem("sermonTitle", title);
+      localStorage.setItem("sermonBody", body);
+    }
+
+    async function callAI(prompt) {
+      const res = await fetch(aiEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      return data.result;
+    }
+
+    async function summarize() {
+      const content = document.getElementById("body").value;
+      const result = await callAI("다음 설교를 요약해줘:\n" + content);
+      alert("✂ 요약 결과:\n" + result);
+    }
+
+    async function correctGrammar() {
+      const content = document.getElementById("body").value;
+      const result = await callAI("다음 설교의 문법과 표현을 자연스럽게 수정해줘:\n" + content);
+      document.getElementById("body").value = result;
+      alert("🔤 문법 교정 완료!");
+    }
+
+    async function generateStructure() {
+      const title = document.getElementById("title").value;
+      const scripture = document.getElementById("bible-area").innerText;
+      const result = await callAI(`"${title}"라는 주제와 "${scripture}" 본문으로 설교 개요를 만들어줘.`);
+      alert("🧠 설교 구조:\n" + result);
+    }
+  </script>
+
+</body>
+</html>

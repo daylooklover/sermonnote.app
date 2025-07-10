@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>설교 작성 - 퀵메모 + AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Nanum Gothic', sans-serif;
+      background: var(--bg, #f9f9f9);
+      color: var(--text, #222);
+      display: flex;
+      height: 100vh;
+    }
+
+    .left-panel {
+      width: 300px;
+      background: var(--side, #e0e0e0);
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .left-panel h2 {
+      font-size: 18px;
+      color: #1976d2;
+      margin-bottom: 10px;
+    }
+
+    .memo-item {
+      background: #fff;
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: 1px solid #ccc;
+    }
+
+    .memo-item:hover {
+      background: #f0f0f0;
+    }
+
+    .right-panel {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      flex: 1;
+      padding: 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      background: #fff;
+      color: #000;
+      border: 1px solid #ccc;
+      resize: vertical;
+      min-height: 200px;
+      box-shadow: inset 0 0 5px #bbb;
+    }
+
+    .button-bar {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-start;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: #1976d2;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #0d47a1;
+    }
+
+    #resultBox {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e3f2fd;
+      border-radius: 10px;
+      white-space: pre-line;
+      color: #000;
+      resize: vertical;
+      min-height: 100px;
+      overflow-y: auto;
+    }
+
+    .top-bar {
+      margin-bottom: 10px;
+      text-align: right;
+    }
+
+    .top-bar button {
+      background: #555;
+      margin-left: 10px;
+    }
+
+    .top-bar button.light {
+      background: #eee;
+      color: #000;
+    }
+
+    /* 추가된 스타일: 원어/주석 팝업 */
+    #wordInfoPopup {
+        position: absolute;
+        background: #333;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: none; /* 초기에는 숨김 */
+        max-width: 300px;
+        text-align: left;
+        line-height: 1.4;
+    }
+    #wordInfoPopup p {
+        margin: 0 0 5px 0;
+    }
+    #wordInfoPopup strong {
+        color: #FFD700; /* 황금색 강조 */
+    }
+    #wordInfoPopup .original-text {
+        font-family: 'Times New Roman', serif; /* 원어 폰트 */
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    #wordInfoPopup .original-language {
+        font-size: 0.9em;
+        color: #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="left-panel">
+    <h2>📝 퀵메모</h2>
+    <div id="memoList"></div>
+  </div>
+
+  <div class="right-panel">
+    <div class="top-bar">
+      <button onclick="toggleTheme()">🌙 테마 변경</button>
+    </div>
+    <h1>📖 설교문 작성</h1>
+    <textarea id="sermonText" placeholder="설교문을 작성하거나 퀵메모를 삽입할 수 있습니다."></textarea>
+
+    <div class="button-bar">
+      <button onclick="saveToFirebase()">💾 저장</button>
+      <button onclick="generateOutline()">✍ 개요 생성</button>
+      <button onclick="recommendBible()">📖 성경 추천</button>
+      <button onclick="fixGrammar()">🪄 문법 수정</button>
+      <button onclick="startVoice()">🎤 음성입력</button>
+      <button onclick="print()">🖨️ 인쇄</button>
+    </div>
+
+    <div id="resultBox">💡 AI 결과가 여기에 표시됩니다...</div>
+  </div>
+
+    <div id="wordInfoPopup"></div>
+
+  <script>
+    // 테마 전환
+    function toggleTheme() {
+      const isDark = document.body.style.getPropertyValue('--bg') === '#1c1c2b';
+      if (isDark) {
+        document.body.style.setProperty('--bg', '#f9f9f9');
+        document.body.style.setProperty('--text', '#222');
+        document.body.style.setProperty('--side', '#e0e0e0');
+      } else {
+        document.body.style.setProperty('--bg', '#1c1c2b');
+        document.body.style.setProperty('--text', '#eee');
+        document.body.style.setProperty('--side', '#2c2c3b');
+      }
+    }
+
+    // 퀵메모 불러오기
+    const quickmemos = JSON.parse(localStorage.getItem("quickmemos")) || [
+      "하나님의 은혜는 무한합니다.",
+      "믿음은 시련을 견디게 합니다.",
+      "사랑은 모든 것을 이깁니다."
+    ];
+
+    const memoListEl = document.getElementById("memoList");
+    const sermonText = document.getElementById("sermonText");
+
+    function renderMemos() {
+      memoListEl.innerHTML = "";
+      quickmemos.forEach((memo) => {
+        const div = document.createElement("div");
+        div.className = "memo-item";
+        div.textContent = memo;
+        div.onclick = () => {
+          sermonText.value += (sermonText.value ? "\n" : "") + memo;
+        };
+        memoListEl.appendChild(div);
+      });
+    }
+
+    // 음성 인식
+    function startVoice() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'ko-KR';
+      recognition.start();
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        sermonText.value += "\n" + transcript;
+      };
+      recognition.onerror = function(event) {
+        alert("음성 인식 오류: " + event.error);
+      };
+    }
+
+    // Firebase 초기화
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1YVJr-aPDADp-SgYtA9X2XagYoTTJn4M",
+      authDomain: "sermonnote-live.firebaseapp.com",
+      projectId: "sermonnote-live",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function saveToFirebase() {
+      const content = sermonText.value.trim();
+      if (!content) return alert("설교문을 작성해주세요.");
+      db.collection("sermons").add({
+        content,
+        timestamp: new Date()
+      }).then(() => alert("✅ 설교 저장 완료!"));
+    }
+
+    async function callAI(prompt) {
+      const res = await fetch("https://us-central1-sermonnote-live.cloudfunctions.net/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      return data.result || "⚠️ AI 응답 오류";
+    }
+
+    async function generateOutline() {
+      const text = sermonText.value;
+      const result = await callAI(`"${text}"에 대한 설교 개요를 작성해줘. 서론, 본론, 결론 포함.`);
+      document.getElementById("resultBox").innerText = result;
+    }
+
+    async function recommendBible() {
+      const text = sermonText.value;
+      const result = await callAI(`"${text}"와 관련된 성경 구절 3개를 추천해줘 (설명 포함).`);
+      document.getElementById("resultBox").innerText = result;
+    }
+
+    async function fixGrammar() {
+      const text = sermonText.value;
+      const result = await callAI(`다음 설교문의 문장을 다듬어줘:\n${text}`);
+      document.getElementById("resultBox").innerText = result;
+    }
+
+    renderMemos();
+
+    // 새롭게 추가된 JavaScript 코드: 원어/주석 팝업 기능
+    const wordInfoPopup = document.getElementById("wordInfoPopup");
+
+    sermonText.addEventListener('mouseup', function(event) {
+        // 텍스트 선택(드래그)이 끝났을 때
+        const selectedText = window.getSelection().toString().trim();
+
+        if (selectedText.length > 0) { // 선택된 텍스트가 있을 경우
+            // 예시 데이터 (실제로는 백엔드 API에서 가져와야 함)
+            const exampleData = {
+                "사랑은": {
+                    original: "ἀγάπη (agapē)",
+                    language: "그리스어",
+                    meaning: "하나님의 조건 없는 사랑, 이타적인 사랑을 의미합니다. 단순히 감정적인 사랑을 넘어선 의지적이고 희생적인 사랑입니다."
+                },
+                "하나님": {
+                    original: "θεός (theos)",
+                    language: "그리스어",
+                    meaning: "모든 것을 창조하고 다스리는 신. 구약의 '엘로힘' 또는 '야훼'에 해당합니다."
+                },
+                "세상을": {
+                    original: "κόσμος (kosmos)",
+                    language: "그리스어",
+                    meaning: "우주 전체, 질서 정연한 세계, 또는 타락한 인류 사회를 의미할 수 있습니다. 문맥에 따라 해석이 달라집니다."
+                },
+                "예수": {
+                    original: "Ἰησοῦς (Iēsous)",
+                    language: "그리스어",
+                    meaning: "하나님의 아들이시며 구원자이신 예수 그리스도의 이름입니다. '여호와는 구원이시다'라는 의미를 가집니다."
+                },
+                // 더 많은 단어에 대한 데이터 추가 가능
+            };
+
+            const info = exampleData[selectedText]; // 선택된 텍스트에 해당하는 정보 찾기
+
+            if (info) {
+                // 팝업 내용 설정
+                wordInfoPopup.innerHTML = `
+                    <p><strong>선택된 단어:</strong> ${selectedText}</p>
+                    <p class="original-text">${info.original} <span class="original-language">(${info.language})</span></p>
+                    <p><strong>의미/주석:</strong> ${info.meaning}</p>
+                `;
+
+                // 팝업 위치 설정 (마우스 커서 근처)
+                wordInfoPopup.style.left = `${event.pageX + 10}px`;
+                wordInfoPopup.style.top = `${event.pageY + 10}px`;
+                wordInfoPopup.style.display = 'block'; // 팝업 보이기
+            } else {
+                // 해당 단어 정보가 없을 경우 팝업 숨김
+                wordInfoPopup.style.display = 'none';
+            }
+        } else {
+            // 텍스트 선택이 없을 경우 팝업 숨김
+            wordInfoPopup.style.display = 'none';
+        }
+    });
+
+    // 아무 곳이나 클릭하면 팝업 숨기기
+    document.addEventListener('mousedown', function(event) {
+        if (!wordInfoPopup.contains(event.target) && event.target !== sermonText) {
+            wordInfoPopup.style.display = 'none';
+        }
+    });
+
+    // 텍스트 영역 밖을 클릭해도 팝업 숨기기
+    sermonText.addEventListener('blur', function() {
+        wordInfoPopup.style.display = 'none';
+    });
+
+  </script>
+</body>
+</html>

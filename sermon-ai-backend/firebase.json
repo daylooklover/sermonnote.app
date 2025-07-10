@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+  { "source": "/", "destination": "/index.html" },
+  { "source": "/sermon_expository", "destination": "/sermon_expository.html" },
+  { "source": "/custom_sermon", "destination": "/custom_sermon.html" },
+  { "source": "/sermon_linked_ai", "destination": "/sermon_linked_ai.html" }
+]
+    ]
+  },
+  "functions": {
+    "source": "functions"
+  }
+}
