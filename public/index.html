@@ -1,138 +1,85 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>말씀노트</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Nanum Gothic', sans-serif;
-      background: linear-gradient(to bottom, #111, #222);
-      color: #fff;
-      text-align: center;
-      padding-top: 80px;
-    }
-    .header {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-    .header .ai {
-      color: #4da6ff;
-    }
-    .header .note {
-      color: #ffd700;
-    }
-    .quickmemo-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
-    .quickmemo-section {
-      margin-top: 40px;
-    }
-    .memo-list {
-      margin-top: 20px;
-    }
-    .bible-box {
-      margin-top: 40px;
-      padding: 20px;
-      background: #1a1a1a;
-      border-radius: 12px;
-      display: inline-block;
-    }
-    .bible-box h4 {
-      font-size: 1.6rem;
-    }
-    .bible-box .title {
-      font-size: 2rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SermonNote - Deepen Your Faith, Organize Your Insights</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
 <body>
-  <div class="header"><span class="ai">AI</span>를 기반으로 더 깊고 더 은혜로운 설교를 위한 플랫폼 - <span class="note">말씀노트</span></div>
-  <button class="btn btn-primary quickmemo-btn" onclick="toggleMemoList()">🎙 퀵메모 시작</button>
 
-  <div id="bibleVerse" class="bible-box">
-    <div class="title">SermonNote</div>
-    <h4>📖 오늘의 말씀</h4>
-    <p id="verseKr"></p>
-    <p class="text-muted" id="verseEn"></p>
-    <button class="btn btn-warning mt-3" onclick="location.href='login.html'">시작하기</button>
-  </div>
+    <header class="hero-section">
+        <div class="container">
+            <h1>SermonNote</h1>
+            <h2>Deepen Your Faith, Organize Your Insights.</h2>
+            <p>Your ultimate tool for KJV Bible study, powerful note-taking, and sermon preparation.</p>
+            <a href="#download" class="cta-button">Download Now</a>
+            </div>
+    </header>
 
-  <div class="quickmemo-section">
-    <div class="memo-list" id="memoList" style="display: none;"></div>
-  </div>
+    <section class="features-section">
+        <div class="container">
+            <h3>Powerful Features Designed for Deeper Study</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h4>KJV Bible Integration</h4>
+                    <p>Access the timeless King James Version for your daily readings.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Intuitive Note-Taking</h4>
+                    <p>Capture your thoughts and revelations directly on verses or create standalone notes.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Verse Linking & Tagging</h4>
+                    <p>Easily link notes to specific verses and organize them with custom tags.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Powerful Search</h4>
+                    <p>Find any verse or note instantly with advanced search capabilities.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>AI Insights</h4>
+                    <p>Leverage AI to uncover deeper meanings and outline sermon points.</p>
+                </div>
+                </div>
+            </div>
+    </section>
 
-  <script>
-    const verses = [
-      { kr: "태초에 하나님이 천지를 창조하시니라", en: "In the beginning God created the heaven and the earth." },
-      { kr: "여호와는 나의 목자시니 내가 부족함이 없으리로다", en: "The Lord is my shepherd; I shall not want." },
-      { kr: "하나님은 사랑이시라", en: "God is love." },
-      { kr: "무릇 지킬 만한 것보다 더욱 네 마음을 지키라", en: "Above all else, guard your heart." }
-    ];
-    const verse = verses[Math.floor(Math.random() * verses.length)];
-    document.getElementById('verseKr').innerText = verse.kr;
-    document.getElementById('verseEn').innerText = verse.en;
+    <section class="benefits-section">
+        <div class="container">
+            <h3>Why SermonNote? Transform Your Spiritual Journey.</h3>
+            <ul>
+                <li>Enhance your understanding of the KJV Bible.</li>
+                <li>Streamline your sermon preparation process.</li>
+                <li>Keep all your spiritual insights organized in one place.</li>
+                <li>Grow in faith with a dedicated study companion.</li>
+            </ul>
+        </div>
+    </section>
 
-    let recognition;
-    let finalTranscript = '';
+    <section class="download-section" id="download">
+        <div class="container">
+            <h3>Ready to Start Your Deeper Study?</h3>
+            <p>Download SermonNote Today!</p>
+            <div class="download-buttons">
+                <a href="URL_TO_APP_STORE" class="app-store-button">
+                    </a>
+                <a href="URL_TO_GOOGLE_PLAY" class="google-play-button">
+                    </a>
+            </div>
+        </div>
+    </section>
 
-    function startRecording() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert("음성 인식을 지원하지 않는 브라우저입니다.");
-        return;
-      }
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SermonNote. All rights reserved.</p>
+            <nav>
+                <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="terms-of-service.html">Terms of Service</a>
+                <a href="mailto:contact@sermonnote.net">Contact Us</a>
+            </nav>
+        </div>
+    </footer>
 
-      recognition = new SpeechRecognition();
-      recognition.lang = 'ko-KR';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      recognition.onresult = (event) => {
-        finalTranscript = event.results[0][0].transcript;
-        alert(`메모 내용: ${finalTranscript}`);
-      };
-
-      recognition.onerror = (event) => {
-        console.error("음성 인식 오류:", event.error);
-      };
-
-      recognition.start();
-    }
-
-    function saveMemo() {
-      if (!finalTranscript) return alert("녹음된 메모가 없습니다.");
-      let memos = JSON.parse(localStorage.getItem('quickmemos') || '[]');
-      memos.unshift(finalTranscript);
-      if (memos.length > 5) memos = memos.slice(0, 5);
-      localStorage.setItem('quickmemos', JSON.stringify(memos));
-      finalTranscript = '';
-      renderMemos();
-    }
-
-    function renderMemos() {
-      let memos = JSON.parse(localStorage.getItem('quickmemos') || '[]');
-      const list = memos.map((m, i) => `<div>📝 메모 ${i + 1}: ${m}</div>`).join('');
-      document.getElementById('memoList').innerHTML = list;
-    }
-
-    function toggleMemoList() {
-      startRecording();
-      const memoList = document.getElementById('memoList');
-      memoList.style.display = memoList.style.display === 'none' ? 'block' : 'none';
-      renderMemos();
-    }
-
-    renderMemos();
-  </script>
-</body>
+    </body>
 </html>

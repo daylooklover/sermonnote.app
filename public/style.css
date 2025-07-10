@@ -1,0 +1,84 @@
+/* style.css 파일 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; /* 배경색 */
+    color: #333; /* 기본 글자색 */
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.hero-section {
+    background-color: #333; /* 어두운 배경 */
+    color: #fff; /* 흰 글자색 */
+    padding: 100px 0;
+}
+
+.hero-section h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: #007bff; /* 파란색 버튼 */
+    color: #fff;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.features-section, .benefits-section, .download-section {
+    padding: 80px 0;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+.feature-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.feature-item {
+    width: 30%; /* 3개씩 나열 */
+    min-width: 280px; /* 너무 작아지지 않도록 */
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+footer {
+    background-color: #222;
+    color: #eee;
+    padding: 40px 0;
+    font-size: 0.9em;
+}
+
+footer a {
+    color: #eee;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+/* 이미지 및 반응형 디자인을 위한 추가 CSS */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .feature-item {
+        width: 100%; /* 모바일에서는 1개씩 나열 */
+    }
+}
