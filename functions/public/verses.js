@@ -1,0 +1,1 @@
+const verses = [{en: 'John 3:16', ko: '요한복음 3:16'}];

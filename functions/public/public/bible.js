@@ -1,0 +1,1 @@
+// bible fetch logic placeholder
