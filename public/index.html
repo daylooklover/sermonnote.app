@@ -3,210 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SermonNote App</title>
-    <link rel="stylesheet" href="app.css"> <!-- Main app CSS -->
-    <!-- Optional: Google Fonts or Font Awesome for icons if needed -->
+    <title>SermonNote</title>
+    <link href="//cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
 </head>
-<body>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
     <div class="app-container">
-        <!-- 1. Top Header -->
         <header class="app-header">
-            <div class="header-content">
-                <div class="app-logo-name">
-                    <!-- <img src="assets/app_logo.png" alt="SermonNote Logo" class="header-logo"> -->
-                    <span>SermonNote</span>
-                </div>
-                <div class="header-icons">
-                    <button class="icon-button login-button">Login</button> <!-- 로그인 버튼 추가 -->
-                    <button class="icon-button menu-button">☰</button>
-                </div>
+            <div class="app-logo-name">
+                <img src="https://placehold.co/30x30/333/fff?text=SN" alt="SermonNote Logo" class="header-logo">
+                <span>SermonNote</span>
+            </div>
+            <div>
+                <button class="icon-button login-button">Login</button>
+                <button class="icon-button menu-button" id="main-menu-button">☰</button> <!-- ID 추가: main-menu-button -->
             </div>
         </header>
 
-        <!-- 2. Central Content Area - Today's Inspiration -->
-        <main class="main-content">
-            <section class="verse-of-the-day">
-                <h3>Verse of the Day</h3>
-                <p class="verse-text">"The grass withereth, the flower fadeth: but the word of our God shall stand for ever."</p>
-                <span class="verse-reference">Isaiah 40:8 (KJV)</span>
-                <!-- Optional: Read full Bible button -->
-                <!-- <a href="#" class="read-bible-button">Read KJV Bible</a> -->
-            </section>
-        </main>
+        <div class="app-message-display hidden"></div>
 
-        <!-- 3. Bottom Main Action Button - Quick Memo -->
-        <button class="quick-memo-fab">
-            <span class="fab-icon">📝</span> <!-- Or 🎤 or a combination -->
-            <span class="fab-text">Quick Memo</span>
-        </button>
+        <div class="main-content-wrapper"> 
+            <main class="flex-grow p-4 pt-20 pb-20 overflow-auto">
 
-        <!-- Quick Memo Popup (initially hidden, will be controlled by JS) -->
+                <div id="verse-of-the-day-screen" class="content-screen">
+                    <div id="bible-verse-display" style="
+                        text-align: center;
+                        font-size: 1.5em;
+                        font-weight: bold;
+                        margin: 50px auto; /* 중앙 정렬 */
+                        padding: 20px;
+                        max-width: 800px;
+                        width: 90%; /* 화면 너비에 맞춰 조절 */
+                        background-color: #1a202c; /* 앱의 어두운 테마에 맞는 배경색 */
+                        color: #E0E0E0; /* 텍스트 색상 */
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                        min-height: 100px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: opacity 1s ease-in-out;
+                        box-sizing: border-box; /* padding이 너비에 포함되도록 */
+                        border: 2px solid #4CAF50; /* 밝은 초록색 테두리 추가 */
+                    ">
+                        "The Lord is my shepherd; I shall not want." - Psalm 23:1
+                    </div>
+                </div>
+
+                <div id="sermon-selection-buttons-screen" class="content-screen hidden">
+                    <h2 class="screen-title">Choose Sermon Type</h2>
+                    <p class="screen-description">Select the type of sermon you want to create.</p>
+                    <div class="sermon-type-buttons">
+                        <button id="btn-expository" class="sermon-type-button">
+                            <span class="sermon-icon">📖</span> <span class="sermon-title">Expository Sermon</span>
+                            <span class="sermon-description">Deep exploration of biblical truth and precise interpretation.</span>
+                        </button>
+                        <button id="btn-real-life" class="sermon-type-button">
+                            <span class="sermon-icon">💡</span> <span class="sermon-title">Real-Life Application Sermon</span>
+                            <span class="sermon-description">The power of God's Word permeating daily life.</span>
+                        </button>
+                        <button id="btn-linked" class="sermon-type-button">
+                            <span class="sermon-icon">🔗</span> <span class="sermon-title">Quick Memo Linked Sermon</span>
+                            <span class="sermon-description">Weaving scattered pieces of inspiration into a cohesive whole.</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="sermon-expository-screen" class="content-screen hidden">
+                    <h2 class="screen-title">Expository Sermon Creation</h2>
+                    <p class="screen-description">Explore scripture, delve into its depths, and then generate an AI-powered sermon.</p>
+                    <div class="bible-lookup-section">
+                        <input type="text" id="expository-scripture-input" class="scripture-input" placeholder="e.g., John 3:16">
+                        <button id="expository-lookup-button" class="lookup-button">Lookup Scripture</button>
+                        <div id="expository-loading-indicator" class="loading-indicator hidden">Looking up scripture...</div>
+                        <div id="expository-scripture-display" class="scripture-display-area"></div>
+                        
+                        <div class="expository-additional-features">
+                            <button id="expository-original-lang-button" class="action-button">Original Language</button>
+                            <button id="expository-commentary-button" class="action-button">Commentary</button>
+                        </div>
+                        <div id="expository-original-lang-display" class="expository-display-area"></div>
+                        <div id="expository-commentary-display" class="expository-display-area"></div>
+                        <div id="expository-original-lang-loading" class="loading-indicator hidden">Loading Original...</div>
+                        <div id="expository-commentary-loading" class="loading-indicator hidden">Loading Commentary...</div>
+                    </div>
+
+                    <div class="sermon-actions">
+                        <button id="expository-generate-ai-button" class="action-button generate-ai-button">Generate with AI</button>
+                    </div>
+                </div>
+
+                <div id="sermon-real-life-screen" class="content-screen hidden">
+                    <h2 class="screen-title">Real-Life Application Sermon</h2>
+                    <p class="screen-description">Develop sermons with practical, real-life examples.</p>
+                    <textarea id="real-life-sermon-input" class="memo-input sermon-output-textarea" placeholder="Write your real-life application sermon..."></textarea>
+                    
+                    <div class="bible-lookup-section">
+                        <input type="text" id="real-life-scripture-input" class="scripture-input" placeholder="e.g., Romans 8:28">
+                        <button id="real-life-lookup-button" class="lookup-button">Lookup Scripture</button>
+                        <div id="real-life-scripture-display" class="scripture-display-area"></div>
+                    </div>
+
+                    <div class="sermon-actions">
+                        <button id="real-life-generate-ai-button" class="action-button generate-ai-button">Generate with AI</button>
+                        <button id="real-life-print-button" class="action-button print-button">Print</button>
+                        <button id="real-life-pdf-button" class="action-button pdf-button">Save as PDF</button>
+                        <button class="save-memo-button">Save Real-Life Sermon</button>
+                    </div>
+                    <div id="real-life-loading-indicator" class="loading-indicator hidden">Generating...</div>
+                </div>
+
+                <div id="sermon-linked-screen" class="content-screen hidden">
+                    <h2 class="screen-title">Quick Memo Linked Sermon</h2>
+                    <p class="screen-description">Combine your quick memos into a cohesive sermon.</p>
+                    <p class="text-sm text-gray-400 mb-4">You have 5 free memo slots. Login for unlimited storage.</p>
+                    <div class="memo-list-placeholder">
+                    </div>
+                    
+                    <div class="bible-lookup-section">
+                        <input type="text" id="linked-scripture-input" class="scripture-input" placeholder="e.g., Psalm 23:1">
+                        <button id="linked-lookup-button" class="lookup-button">Lookup Scripture</button>
+                        <div id="linked-scripture-display" class="scripture-display-area"></div>
+                    </div>
+
+                    <textarea id="linked-sermon-output" class="memo-input sermon-output-textarea mt-4" placeholder="Generated sermon will appear here..."></textarea>
+
+                    <div class="sermon-actions">
+                        <button id="linked-generate-ai-button" class="action-button generate-ai-button">Generate with AI</button>
+                        <button id="linked-print-button" class="action-button print-button">Print</button>
+                        <button id="linked-pdf-button" class="action-button pdf-button">Save as PDF</button>
+                        <button class="save-memo-button">Generate Linked Sermon</button>
+                    </div>
+                    <div id="linked-loading-indicator" class="loading-indicator hidden">Generating...</div>
+                </div>
+            </main>
+        </div> 
         <div class="quick-memo-popup-overlay hidden">
             <div class="quick-memo-popup">
                 <div class="popup-header">
-                    <h4>Capture Your Insight</h4>
+                    <h4>Quick Memo</h4>
                     <button class="close-popup-button">X</button>
                 </div>
-                <div class="popup-body">
-                    <textarea class="memo-input" placeholder="Write down your inspiration or click the mic to record..."></textarea>
-                    <div class="voice-memo-controls">
-                        <button class="mic-button">🎤</button>
-                        <span class="recording-timer">00:00</span>
-                    </div>
+                <textarea class="memo-input" placeholder="Write your quick memo here..."></textarea>
+                <div class="voice-memo-controls">
+                    <button class="mic-button">🎤</button>
+                    <span class="recording-timer">00:00</span>
                 </div>
                 <div class="popup-footer">
                     <span class="memo-limit-info">You have 0 of 5 free memos remaining.</span>
-                    <button class="save-memo-button">Save</button>
+                    <button class="save-memo-button">Save Memo</button>
                 </div>
-                <div class="login-prompt">
-                    <p>Log in or <a href="#">Sign Up</a> to sync your memos.</p>
-                </div>
+                <p class="login-prompt">
+                    <a href="#" class="show-auth-popup-link">Login</a> for unlimited memos.
+                </p>
             </div>
         </div>
 
-    </div> <!-- /app-container -->
-
-    <!-- ==================================================================== -->
-    <!-- 재민님, 여기에 로그인/회원가입 팝업 HTML 코드가 추가됩니다. -->
-    <!-- ==================================================================== -->
-    <div class="auth-popup-overlay hidden">
-        <div class="auth-popup">
-            <div class="popup-header">
-                <h4 id="auth-popup-title">Login</h4> <!-- Title will change between Login/Signup -->
-                <button class="close-auth-popup-button">X</button>
-            </div>
-            <div class="popup-body">
-                <input type="email" id="auth-email" placeholder="Email" class="auth-input">
-                <input type="password" id="auth-password" placeholder="Password" class="auth-input">
-                <input type="password" id="auth-confirm-password" placeholder="Confirm Password" class="auth-input hidden"> <!-- For signup -->
-            </div>
-            <div class="popup-footer">
-                <button id="auth-submit-button" class="auth-submit-button">Login</button>
-                <p class="auth-toggle-text">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
-                <p class="auth-toggle-text hidden">Already have an account? <a href="#" id="show-login">Login</a></p>
-                <p class="auth-error-message hidden"></p> <!-- For displaying errors -->
-            </div>
-        </div>
-    </div>
-    <!-- ==================================================================== -->
-<script src="app.js"></script> <!-- Main app JS -->
-</body>
-</html>
-    <script src="app.js"></script> <!-- Main app JS -->
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SermonNote App</title>
-    <link rel="stylesheet" href="app.css"> <!-- Main app CSS -->
-    <!-- Optional: Google Fonts or Font Awesome for icons if needed -->
-</head>
-<body>
-    <div class="app-container">
-        <!-- 1. Top Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="app-logo-name">
-                    <!-- <img src="assets/app_logo.png" alt="SermonNote Logo" class="header-logo"> -->
-                    <span>SermonNote</span>
-                </div>
-                <div class="header-icons">
-                    <button class="icon-button login-button">Login</button> <!-- 로그인 버튼 추가 -->
-                    <button class="icon-button menu-button">☰</button>
-                </div>
-            </div>
-        </header>
-
-        <!-- 2. Central Content Area - Today's Inspiration -->
-        <main class="main-content">
-            <section class="verse-of-the-day">
-                <h3>Verse of the Day</h3>
-                <p class="verse-text">"The grass withereth, the flower fadeth: but the word of our God shall stand for ever."</p>
-                <span class="verse-reference">Isaiah 40:8 (KJV)</span>
-                <!-- Optional: Read full Bible button -->
-                <!-- <a href="#" class="read-bible-button">Read KJV Bible</a> -->
-            </section>
-        </main>
-
-        <!-- 3. Bottom Main Action Button - Quick Memo -->
-        <button class="quick-memo-fab">
-            <span class="fab-icon">📝</span> <!-- Or 🎤 or a combination -->
-            <span class="fab-text">Quick Memo</span>
-        </button>
-
-        <!-- Quick Memo Popup (initially hidden, will be controlled by JS) -->
-        <div class="quick-memo-popup-overlay hidden">
-            <div class="quick-memo-popup">
+        <div class="auth-popup-overlay hidden">
+            <div class="auth-popup">
                 <div class="popup-header">
-                    <h4>Capture Your Insight</h4>
-                    <button class="close-popup-button">X</button>
+                    <h4 id="auth-popup-title">Login</h4>
+                    <button class="close-auth-popup-button">X</button>
                 </div>
-                <div class="popup-body">
-                    <textarea class="memo-input" placeholder="Write down your inspiration or click the mic to record..."></textarea>
-                    <div class="voice-memo-controls">
-                        <button class="mic-button">🎤</button>
-                        <span class="recording-timer">00:00</span>
-                    </div>
-                </div>
-                <div class="popup-footer">
-                    <span class="memo-limit-info">You have 0 of 5 free memos remaining.</span>
-                    <button class="save-memo-button">Save</button>
-                </div>
-                <div class="login-prompt">
-                    <p>Log in or <a href="#">Sign Up</a> to sync your memos.</p>
-                </div>
-            </div>
-        </div>
-
-    </div> <!-- /app-container -->
-
-    <!-- Login/Signup Popups (initially hidden) -->
-    <div class="auth-popup-overlay hidden">
-        <div class="auth-popup">
-            <div class="popup-header">
-                <h4 id="auth-popup-title">Login</h4> <!-- Title will change between Login/Signup -->
-                <button class="close-auth-popup-button">X</button>
-            </div>
-            <div class="popup-body">
-                <input type="email" id="auth-email" placeholder="Email" class="auth-input">
-                <input type="password" id="auth-password" placeholder="Password" class="auth-input">
-                <input type="password" id="auth-confirm-password" placeholder="Confirm Password" class="auth-input hidden"> <!-- For signup -->
-            </div>
-            <div class="popup-footer">
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email Address" required>
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password" required>
+                <input type="password" id="auth-confirm-password" class="auth-input hidden" placeholder="Confirm Password">
                 <button id="auth-submit-button" class="auth-submit-button">Login</button>
-                <p class="auth-toggle-text">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
-                <p class="auth-toggle-text hidden">Already have an account? <a href="#" id="show-login">Login</a></p>
-                <p class="auth-error-message hidden"></p> <!-- For displaying errors -->
+                <p class="auth-error-message hidden"></p>
+                <p class="auth-toggle-text">
+                    Don't have an account? <a href="#" id="show-signup">Sign Up</a>
+                    <a href="#" id="show-login" class="hidden">Already have an account? Login</a>
+                </p>
             </div>
         </div>
-    </div>
 
-    <!-- Firebase SDK 불러오기 -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+        <div id="contextual-lookup-popup" class="contextual-lookup-popup hidden">
+            <div class="contextual-content" id="contextual-content-area">
+                </div>
+            <div class="contextual-actions">
+                <button class="contextual-action-button add-to-sermon-button">Add to Sermon</button>
+                <button class="contextual-action-button close-contextual-popup">Close</button>
+            </div>
+        </div>
 
-    <!-- Your web app's Firebase configuration -->
+    </div> 
+    
+    <!-- 퀵 메모 FAB 버튼의 ID를 추가합니다. -->
+    <button class="quick-memo-fab" id="quick-memo-fab-button">🎤 Quick Memo</button>
+
+    <!-- Firebase SDKs는 </body> 닫기 직전에 배치하여 DOM이 로드된 후 실행되도록 합니다. -->
+    <script src="//www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="//www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="//www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <script>
-      const firebaseConfig = {
-  apiKey: "AIzaSyDuF64w0S6ZcoXAuhtahlUAhCgAYnOFBXo",
-  authDomain: "sermonnote-live.firebaseapp.com",
-  projectId: "sermonnote-live",
-  storageBucket: "sermonnote-live.firebasestorage.app",
-  messagingSenderId: "520754190508",
-  appId: "1:520754190508:web:cc4271b1e96e0bed3ee709",
-  measurementId: "G-CWDVF5K3HX"
-};
-
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-
-      // Firebase Auth 객체 초기화 (나중에 사용)
-      const auth = firebase.auth();
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuF64w0S6ZcoXAuhtahlUAhCgAYnOFBXo", // 귀하의 실제 API 키
+            authDomain: "sermonnote-live.firebaseapp.com",
+            projectId: "sermonnote-live",
+            storageBucket: "sermonnote-live.appspot.com",
+            messagingSenderId: "520754190508",
+            appId: "1:520754190508:web:cc4271b1e96e0bed3ee709",
+            // measurementId: "G-CWDVF5K3HX" // 구글 애널리틱스 사용하지 않으면 제거해도 됩니다.
+        };
+        firebase.initializeApp(firebaseConfig);
     </script>
-
-    <script src="app.js"></script> <!-- Main app JS -->
+    <!-- app.js는 모든 HTML 요소와 Firebase SDK가 로드된 후 실행되도록 맨 마지막에 배치합니다. -->
+    <script src="app.js?v=202507150717"></script>
 </body>
 </html>
